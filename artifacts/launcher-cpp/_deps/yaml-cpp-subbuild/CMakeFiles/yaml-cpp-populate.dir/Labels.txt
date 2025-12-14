@@ -1,0 +1,14 @@
+# Target labels
+ yaml-cpp-populate
+# Source files and their labels
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/CMakeFiles/yaml-cpp-populate
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/CMakeFiles/yaml-cpp-populate.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/CMakeFiles/yaml-cpp-populate-complete.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-build.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-configure.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-download.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-install.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-mkdir.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-patch.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-test.rule
+/home/bimba/Projects/multiroom/artifacts/launcher-cpp/_deps/yaml-cpp-subbuild/yaml-cpp-populate-prefix/src/yaml-cpp-populate-stamp/yaml-cpp-populate-update.rule

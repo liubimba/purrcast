@@ -1,0 +1,28 @@
+productName: "Multiroom"
+appId: "com.multiroom.app"
+
+directories:
+  output: "../release"
+  buildResources: "resources"
+
+files:
+  - "**/*"
+
+extraResources:
+  - from: "resources"
+    to: "."
+
+linux:
+  target:
+    - deb
+    - AppImage
+  category: "Audio"
+
+win:
+  target:
+    - nsis
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.music
