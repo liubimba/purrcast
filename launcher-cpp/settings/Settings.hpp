@@ -35,8 +35,9 @@ struct settings
     {
         struct s_server : module_description
         {
-            std::string bin = "./backend";
-            int port = 8080;
+            std::string bin;
+            std::string static_dir;
+            int port = -1;
 
             s_server()
             {
@@ -141,8 +142,7 @@ struct settings
                 }
             };
 
-            std::string bin = "./snapserver";
-            std::string host = "0.0.0.0";
+            std::string bin;
             std::string config;
             s_ports ports{};
 
@@ -156,7 +156,7 @@ struct settings
 
             bool operator==(const s_snapserver& oth) const
             {
-                return dependsOn == oth.dependsOn && bin == oth.bin && config == oth.config && host == oth.host &&
+                return dependsOn == oth.dependsOn && bin == oth.bin && config == oth.config &&
                     ports == oth.ports;
             }
         };
@@ -164,7 +164,7 @@ struct settings
         struct s_snapclient : module_description
         {
             std::vector<std::string> dependsOn = {"snapserver"};
-            std::string bin = "./snapclient";
+            std::string bin;
             std::string args;
             int sinkIndex = -1;
 

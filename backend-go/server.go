@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gorilla/websocket"
 )
@@ -82,34 +84,65 @@ type ConfigResponse struct {
 	WebsocketConfig  WebsocketConfig  `json:"websocket"`
 }
 
-func configHandler(w http.ResponseWriter, r *http.Request) {
-	cfg := ConfigResponse{
-		SnapserverConfig: SnapserverConfig{
-			Ports: SnapserverPorts{Http: 1780},
-		},
-		WebsocketConfig: WebsocketConfig{
-			Path: "/ws",
-			Port: 8080,
-		},
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	err := json.NewEncoder(w).Encode(cfg)
-	if err != nil {
-		return
+func makeConfigHandler(listenPort int) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cfg := ConfigResponse{
+			SnapserverConfig: SnapserverConfig{
+				Ports: SnapserverPorts{Http: 1780},
+			},
+			WebsocketConfig: WebsocketConfig{
+				Path: "/ws",
+				Port: listenPort,
+			},
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(cfg)
 	}
 }
 
+func spaHandler(staticPath string, indexFile string) http.Handler {
+	fs := http.FileServer(http.Dir(staticPath))
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := filepath.Join(staticPath, r.URL.Path)
+
+		info, err := os.Stat(path)
+		if err == nil && !info.IsDir() {
+			fs.ServeHTTP(w, r)
+			return
+		}
+		http.ServeFile(w, r, filepath.Join(staticPath, indexFile))
+	})
+}
+
 func main() {
-	port := flag.Int("port", 8080, "Port to listen on")
+	port := flag.Int("port", -1, "Port to listen on")
+	staticDir := flag.String("static_dir", "", "Directory with web-react static files")
 	flag.Parse()
+	if *port <= 0 {
+		log.Fatal("--port must be specified")
+	}
+	if *staticDir == "" {
+		log.Fatal("--static_dir must be specified")
+	}
+	absStaticDir, err := filepath.Abs(*staticDir)
+	if err != nil {
+		log.Fatalf("Failed to resolve static_dir: %v", err)
+	}
+	info, err := os.Stat(absStaticDir)
+	if err != nil || !info.IsDir() {
+		log.Fatalf("static_dir is not a directory: %s", absStaticDir)
+	}
 
 	addr := fmt.Sprintf(":%d", *port)
+
+	http.Handle("/", spaHandler(absStaticDir, "index.html"))
 
 	hub := newHub()
 	go hub.run()
 
-	http.HandleFunc("/api/config", configHandler)
+	http.HandleFunc("/api/config", makeConfigHandler(*port))
 	http.HandleFunc("/ws", hub.upgradeHandler)
 
 	log.Printf("Listening on %s\n", addr)
