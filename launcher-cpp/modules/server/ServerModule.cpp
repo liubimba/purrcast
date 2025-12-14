@@ -33,7 +33,7 @@ bool ServerModule::load(const ModuleParams& moduleParams)
         }
         std::unique_lock lock(mutex_);
         std::unique_ptr<Process> process = std::make_unique<Process>(p_services_, name());
-        std::string args = absl::StrFormat("--port %d", params.port);
+        std::string args = absl::StrFormat("--port %d --static_dir %s", params.port, params.static_dir);
         if (process->execute(params.bin, args))
         {
                 p_logger_->info("Process started");
