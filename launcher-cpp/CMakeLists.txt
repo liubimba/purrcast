@@ -151,7 +151,6 @@ if (RUN_TESTS)
     enable_testing()
 
     add_executable(multiroom_tests
-            tests/PathTests.cpp
             tests/ServicesTests.cpp
             tests/SettingsTests.cpp
             tests/LoggerFactoryTests.cpp

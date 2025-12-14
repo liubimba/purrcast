@@ -10,7 +10,9 @@
 #include "../../settings/Settings.hpp"
 #include "../../services/Services.hpp"
 #include "../../logger/LoggerFactory.hpp"
+#include <filesystem>
 
+#include "absl/strings/str_format.h"
 #if defined(__linux__)
 #include <alsa/asoundlib.h>
 #endif

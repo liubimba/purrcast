@@ -7,34 +7,38 @@
 
 int main(int argc, char** argv)
 {
-    argparse::ArgumentParser parser("multiroom");
+      argparse::ArgumentParser parser("multiroom");
 
-    parser.add_argument("--root_dir")
-          .help("Path to root directory")
-          .default_value("../");
-    parser.add_argument("--config_dir")
-          .help("Path to config directory")
-          .default_value("../config");
-    parser.add_argument("--bin_dir")
-          .help("Path to binary directory")
-          .default_value("../bin");
+      parser.add_argument("--snapserver.path")
+            .help("Path to snapserver binary file")
+            .default_value("./snapserver");
+      parser.add_argument("--snapserver.config")
+            .help("Path to snapserver config file")
+            .default_value("");
+      parser.add_argument("--snapclient.path")
+            .help("Path to snapclient binary file")
+            .default_value("./snapclient");
+      parser.add_argument("--server.path")
+            .help("Path to server binary file")
+            .default_value("./backend");
 
-    try
-    {
-        parser.parse_args(argc, argv);
+      try
+      {
+            parser.parse_args(argc, argv);
 
-        Path::BIN = std::filesystem::path(parser.get<std::string>("bin_dir"));
-        Path::ROOT = std::filesystem::path(parser.get<std::string>("root_dir"));
-        Path::CONFIG = std::filesystem::path(parser.get<std::string>("config_dir"));
+            settings settings;
 
-        settings settings;
-        Launcher launcher;
-        launcher.launch(settings);
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        std::cerr << parser;
-        std::exit(EXIT_FAILURE);
-    }
+            settings.module.server.bin = parser.get<std::string>("--server.path");
+            settings.module.snapclient.bin = parser.get<std::string>("--snapclient.path");
+            settings.module.snapserver.bin = parser.get<std::string>("--snapserver.path");
+            settings.module.snapserver.config = parser.get<std::string>("--snapserver.config");
+            Launcher launcher;
+            launcher.launch(settings);
+      }
+      catch (const std::exception& e)
+      {
+            std::cerr << e.what() << std::endl;
+            std::cerr << parser;
+            std::exit(EXIT_FAILURE);
+      }
 }

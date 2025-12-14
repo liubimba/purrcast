@@ -4,8 +4,6 @@
 
 #include "SnapclientModule.hpp"
 
-#include "absl/strings/str_format.h"
-
 
 SnapclientModule::SnapclientModule(const Services* services):
     services_(services), params_(settings::s_module::s_snapclient())
@@ -21,7 +19,7 @@ bool SnapclientModule::load(const ModuleParams& moduleParams)
     if (loaded())
         throw std::runtime_error("SnapclientModule already loaded");
     settings::s_module::s_snapclient params = std::get<settings::s_module::s_snapclient>(moduleParams);
-    if (!std::filesystem::exists(params.cmd))
+    if (!std::filesystem::exists(params.bin))
         throw std::runtime_error("SnapclientModule binary file does not exists");
     PcmDevice device = resolveAudioDeviceName_(params.sinkIndex);
     if (device.name.empty())
@@ -32,7 +30,7 @@ bool SnapclientModule::load(const ModuleParams& moduleParams)
     params.args = absl::StrFormat("%s --soundcard %s", params.args, device.name);
     std::unique_lock lock(mutex_);
     std::unique_ptr<Process> process = std::make_unique<Process>(services_, logger_->name());
-    if (process->execute(params.cmd, params.args))
+    if (process->execute(params.bin, params.args))
     {
         logger_->info("Successfully executed Snapclient process");
         p_snapclientProcess = std::move(process);

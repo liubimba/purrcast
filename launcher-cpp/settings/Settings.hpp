@@ -8,7 +8,6 @@
 #include <boost/chrono/ceil.hpp>
 
 #include "../modules/ModuleDescription.hpp"
-#include "../path/Path.hpp"
 #include "absl/log/internal/config.h"
 #include "absl/strings/str_format.h"
 #include "spdlog/spdlog.h"
@@ -36,7 +35,7 @@ struct settings
     {
         struct s_server : module_description
         {
-            std::string cmd = Path::bin("server");
+            std::string bin = "./backend";
             int port = 8080;
 
             s_server()
@@ -49,7 +48,7 @@ struct settings
 
             bool operator==(const s_server& other) const
             {
-                return cmd == other.cmd && port == other.port;
+                return bin == other.bin && port == other.port;
             }
         };
 
@@ -142,9 +141,9 @@ struct settings
                 }
             };
 
-            std::string cmd = Path::bin("snapserver");
-            std::string args = absl::StrFormat("--config %s", Path::config("snapserver.conf"));
+            std::string bin = "./snapserver";
             std::string host = "0.0.0.0";
+            std::string config;
             s_ports ports{};
 
             s_snapserver()
@@ -157,7 +156,7 @@ struct settings
 
             bool operator==(const s_snapserver& oth) const
             {
-                return dependsOn == oth.dependsOn && cmd == oth.cmd && args == oth.args && host == oth.host &&
+                return dependsOn == oth.dependsOn && bin == oth.bin && config == oth.config && host == oth.host &&
                     ports == oth.ports;
             }
         };
@@ -165,8 +164,8 @@ struct settings
         struct s_snapclient : module_description
         {
             std::vector<std::string> dependsOn = {"snapserver"};
-            std::string cmd = Path::bin("snapclient");
-            std::string args = "";
+            std::string bin = "./snapclient";
+            std::string args;
             int sinkIndex = -1;
 
             s_snapclient()
@@ -181,7 +180,7 @@ struct settings
             bool operator==(const s_snapclient& oth) const
             {
                 return dependsOn == oth.dependsOn && name == oth.name &&
-                    cmd == oth.cmd && args == oth.args && sinkIndex == oth.sinkIndex;
+                    bin == oth.bin && args == oth.args && sinkIndex == oth.sinkIndex;
             }
         };
 

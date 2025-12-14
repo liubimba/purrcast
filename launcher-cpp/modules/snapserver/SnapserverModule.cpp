@@ -4,6 +4,8 @@
 
 #include "SnapserverModule.hpp"
 
+#include <filesystem>
+
 #include "../../logger/LoggerFactory.hpp"
 #include "../../util/Port.hpp"
 #include "../../util/Process.hpp"
@@ -47,10 +49,15 @@ bool SnapserverModule::load(const ModuleParams& moduleParams)
     //     logger_->error("Control server port {} is bound", params.ports.control);
     //     return false;
     // }
+    std::string args;
+    if (std::filesystem::exists(params.config))
+    {
+        args = absl::StrFormat("--config %s", params.config);
+    }
     std::unique_lock lock(mutex_);
     std::unique_ptr<Process> p_process = std::make_unique<Process>(services_, "snapserver");
     logger_->info("Executing snapserver process");
-    if (p_process->execute(params.cmd, params.args))
+    if (p_process->execute(params.bin, args))
     {
         logger_->info("Successfully executed snapserver process");
         p_snapserverProcess_ = std::move(p_process);

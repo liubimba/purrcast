@@ -919,11 +919,6 @@ CMakeFiles/multiroom.dir/launcher/App.cpp.o: \
  /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../IModule.hpp \
  /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../../settings/Settings.hpp \
  /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../../settings/../modules/ModuleDescription.hpp \
- /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../../settings/../path/Path.hpp \
- /usr/include/c++/13/filesystem /usr/include/c++/13/bits/fs_fwd.h \
- /usr/include/c++/13/bits/fs_path.h /usr/include/c++/13/iomanip \
- /usr/include/c++/13/bits/quoted_string.h /usr/include/c++/13/codecvt \
- /usr/include/c++/13/bits/fs_dir.h /usr/include/c++/13/bits/fs_ops.h \
  /home/bimba/Projects/multiroom/launcher-cpp/libs/abseil-cpp/absl/log/internal/config.h \
  /home/bimba/Projects/multiroom/launcher-cpp/libs/abseil-cpp/absl/base/config.h \
  /home/bimba/Projects/multiroom/launcher-cpp/libs/abseil-cpp/absl/base/options.h \
@@ -976,6 +971,10 @@ CMakeFiles/multiroom.dir/launcher/App.cpp.o: \
  /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../snapclient/../../settings/Settings.hpp \
  /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../snapclient/../../services/Services.hpp \
  /home/bimba/Projects/multiroom/launcher-cpp/launcher/../modules/manager/../snapclient/../../logger/LoggerFactory.hpp \
+ /usr/include/c++/13/filesystem /usr/include/c++/13/bits/fs_fwd.h \
+ /usr/include/c++/13/bits/fs_path.h /usr/include/c++/13/iomanip \
+ /usr/include/c++/13/bits/quoted_string.h /usr/include/c++/13/codecvt \
+ /usr/include/c++/13/bits/fs_dir.h /usr/include/c++/13/bits/fs_ops.h \
  /usr/include/alsa/asoundlib.h /usr/include/fcntl.h \
  /usr/include/x86_64-linux-gnu/bits/fcntl.h \
  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \

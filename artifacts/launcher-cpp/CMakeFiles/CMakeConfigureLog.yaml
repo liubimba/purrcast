@@ -1264,3 +1264,45 @@ events:
       variable: "run_result_unused"
       cached: true
 ...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "libs/snapcast/cmake/TargetArch.cmake:112 (try_run)"
+      - "libs/snapcast/CMakeLists.txt:170 (target_architecture)"
+    directories:
+      source: "/home/bimba/Projects/multiroom/artifacts/launcher-cpp/CMakeFiles/CMakeTmp"
+      binary: "/home/bimba/Projects/multiroom/artifacts/launcher-cpp/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/bimba/Projects/multiroom/launcher-cpp/libs/snapcast/cmake/"
+    buildResult:
+      variable: "compile_result_unused"
+      cached: true
+      stdout: |
+        Change Dir: '/home/bimba/Projects/multiroom/artifacts/launcher-cpp/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_c63b5/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_c63b5.dir/build.make CMakeFiles/cmTC_c63b5.dir/build
+        gmake[1]: Entering directory '/home/bimba/Projects/multiroom/artifacts/launcher-cpp/CMakeFiles/CMakeTmp'
+        Building C object CMakeFiles/cmTC_c63b5.dir/arch.c.o
+        /usr/bin/cc   -std=gnu17 -o CMakeFiles/cmTC_c63b5.dir/arch.c.o -c /home/bimba/Projects/multiroom/artifacts/launcher-cpp/arch.c
+        /home/bimba/Projects/multiroom/artifacts/launcher-cpp/arch.c:27:6: error: #error cmake_ARCH x86_64
+           27 |     #error cmake_ARCH x86_64
+              |      ^~~~~
+        /home/bimba/Projects/multiroom/artifacts/launcher-cpp/arch.c:40:2: error: #error cmake_ARCH unknown
+           40 | #error cmake_ARCH unknown
+              |  ^~~~~
+        gmake[1]: *** [CMakeFiles/cmTC_c63b5.dir/build.make:78: CMakeFiles/cmTC_c63b5.dir/arch.c.o] Error 1
+        gmake[1]: Leaving directory '/home/bimba/Projects/multiroom/artifacts/launcher-cpp/CMakeFiles/CMakeTmp'
+        gmake: *** [Makefile:127: cmTC_c63b5/fast] Error 2
+        
+      exitCode: 2
+    runResult:
+      variable: "run_result_unused"
+      cached: true
+...
