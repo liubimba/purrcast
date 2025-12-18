@@ -27,10 +27,10 @@ bool SnapclientModule::load(const ModuleParams& moduleParams)
         logger_->info("Bad sink index passed: {}, not found any suitable device", params.sinkIndex);
         return false;
     }
-    params.args = absl::StrFormat("%s --soundcard %s", params.args, device.name);
+    std::string soundcard = absl::StrFormat("--soundcard %s", device.name);
     std::unique_lock lock(mutex_);
     std::unique_ptr<Process> process = std::make_unique<Process>(services_, logger_->name());
-    if (process->execute(params.bin, params.args))
+    if (process->execute(params.bin, soundcard))
     {
         logger_->info("Successfully executed Snapclient process");
         p_snapclientProcess = std::move(process);

@@ -2,7 +2,8 @@ import Flac from 'libflacjs/dist/libflac.js'
 import type {IAudioBuffer, IAudioBufferSourceNode, IAudioContext, IGainNode} from 'standardized-audio-context';
 import {AudioContext} from 'standardized-audio-context'
 import {OpusDecoder as WasmOpusDecoder} from "opus-decoder";
-
+import type {Logger} from "./logger/Logger.ts";
+import {LoggerFactory} from "./logger/LoggerFactory.ts";
 
 function getPersistentValue(key: string, defaultValue: string = ""): string {
     if (window.localStorage) {
@@ -259,7 +260,6 @@ class HelloMessage extends JsonMessage {
     uniqueId: string = "";
     snapStreamProtocolVersion: number = 2;
 }
-
 
 class ServerSettingsMessage extends JsonMessage {
     constructor(buffer?: ArrayBuffer) {
@@ -890,10 +890,12 @@ class PcmDecoder extends Decoder {
 
 
 class SnapStream {
+    private _logger: Logger;
+
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;
         this.timeProvider = new TimeProvider();
-
+        this._logger = LoggerFactory.getLogger("SnapStream");
         if (this.setupAudioContext()) {
             this.connect();
         } else {
@@ -904,9 +906,9 @@ class SnapStream {
     public resume() {
         this.ctx.resume()
             .then(() => {
-                console.info("Successfully resumed AudioContext");
+                this._logger.info("Successfully resumed AudioContext");
             }).catch(() => {
-            console.error("Failed to resume AudioContext")
+            this._logger.error("Failed to resume AudioContext")
         })
     }
 
@@ -922,6 +924,9 @@ class SnapStream {
             }
 
             this.ctx = new AudioContextPatched(options);
+            this.ctx.addEventListener("statechange", (state: Event) => {
+                this._logger.info("AudioContext changed state to: ", this.ctx.state);
+            })
             this.gainNode = this.ctx.createGain();
             this.gainNode.connect(this.ctx.destination);
         } else {
@@ -1086,11 +1091,12 @@ class SnapStream {
     }
 
     public pause() {
+        this._logger.info("Pausing AudioContext...");
         this.ctx.suspend()
             .then(() => {
-                console.info("Successfully paused AudioContext");
+                this._logger.info("Successfully paused AudioContext");
             }).catch(() => {
-            console.error("Failed to pause AudioContext")
+            this._logger.error("Failed to pause AudioContext")
         })
     }
 

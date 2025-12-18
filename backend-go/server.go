@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -45,12 +46,72 @@ func (h *Hub) run() {
 	}
 }
 
+type UserDataPayload struct {
+	IsLocal bool `json:"is_local"`
+}
+
+type UserDataMessage struct {
+	Type    string          `json:"type"`
+	Payload UserDataPayload `json:"payload"`
+}
+
+func isLocalConnection(r *http.Request) bool {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return false
+	}
+	remoteIP := net.ParseIP(host)
+	if remoteIP == nil {
+		return false
+	}
+	if remoteIP.IsLoopback() {
+		return true
+	}
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return false
+	}
+	for _, iface := range ifaces {
+		addrs, err := iface.Addrs()
+		if err != nil {
+			continue
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+			if ip != nil && ip.Equal(remoteIP) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (h *Hub) upgradeHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		return
 	}
 	h.clients[conn] = true
+
+	msg := UserDataMessage{
+		Type: "USER_DATA",
+		Payload: UserDataPayload{
+			IsLocal: isLocalConnection(r),
+		},
+	}
+
+	if err := conn.WriteJSON(msg); err != nil {
+		log.Println("write error:", err)
+		conn.Close()
+		return
+	}
+
 	log.Println("new connection %s", conn.LocalAddr())
 	go func() {
 		defer conn.Close()
@@ -86,6 +147,7 @@ type ConfigResponse struct {
 
 func makeConfigHandler(listenPort int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		cfg := ConfigResponse{
 			SnapserverConfig: SnapserverConfig{
 				Ports: SnapserverPorts{Http: 1780},
@@ -97,6 +159,7 @@ func makeConfigHandler(listenPort int) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		json.NewEncoder(w).Encode(cfg)
 	}
 }

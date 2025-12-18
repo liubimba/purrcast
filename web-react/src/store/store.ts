@@ -3,6 +3,7 @@ import {controlSlice, createControlMiddleware} from "./controlSlice.ts";
 import {masterPlayerSlice} from "./masterPlayerSlice.ts";
 import {createSnapcastMiddleware, snapcastSlice} from "./snapcastSlice.ts";
 import {configurationSlice, createConfigurationMiddleware} from "./configurationSlice.ts";
+import {userSlice} from "./userSlice.ts";
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         snapcast: snapcastSlice.reducer,
         control: controlSlice.reducer,
         configuration: configurationSlice.reducer,
+        user: userSlice.reducer,
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware()
         .concat(createConfigurationMiddleware())

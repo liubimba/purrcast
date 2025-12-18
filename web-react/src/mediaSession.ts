@@ -2,21 +2,21 @@ import snapcast from "./assets/snapcast-512.png";
 import {SnapStream} from "./snapstream.ts";
 import type {SnapControl} from "./snapcontrol.ts";
 import silence from "./assets/10-seconds-of-silence.mp3";
+import type {Logger} from "./logger/Logger.ts";
+import {LoggerFactory} from "./logger/LoggerFactory.ts";
 
 export class MediaSession {
     private snapstream: SnapStream | null = null;
     private streamId: string | null = null;
     private snapcontrol: SnapControl;
     private audio: HTMLAudioElement;
+    private logger: Logger;
 
     constructor(snapcontrol: SnapControl, streamId: string) {
         this.snapcontrol = snapcontrol;
         this.streamId = streamId;
         this.audio = new Audio();
-    }
-
-    setSnapstream(snapstream: SnapStream) {
-        this.snapstream = snapstream;
+        this.logger = LoggerFactory.getLogger("MediaSession");
     }
 
     setStreamId(streamId: string) {
@@ -36,7 +36,12 @@ export class MediaSession {
 
         this.audio.src = silence;
         this.audio.loop = true;
-        this.audio.play();
+        this.audio.play()
+            .then(() => {
+                this.logger.info("Audio is playing");
+            }).catch((err) => {
+            this.logger.error("Failed to play audio. Error:", err);
+        })
     }
 
     pause() {

@@ -1,17 +1,14 @@
 import * as React from "react";
-import {useContext} from "react";
 import {useNavigate} from "react-router-dom";
-import {StartedContext} from "../context/StartedContext.tsx";
+import {useClient} from "../hooks/useClient.ts";
 
-interface WelcomePageProps {
-}
 
-export const WelcomePage: React.FC<WelcomePageProps> = ({}) => {
+export const WelcomePage: React.FC<{}> = ({}) => {
     const navigate = useNavigate();
-    const {start} = useContext(StartedContext);
+    const {setClientStarted} = useClient();
 
     const onClick = () => {
-        start();
+        setClientStarted(true);
 
         navigate("/app");
     }

@@ -6,17 +6,12 @@ import {
     type PayloadAction,
     type UnknownAction
 } from "@reduxjs/toolkit";
-import {
-    ConnectionStatus,
-    type ISnapcastNotificationPayload,
-    type SnapcastConnectionStatusPayload,
-    SnapcastNotificationType,
-    type SnapcastServerPayload,
-    SnapcastService
-} from "../services/SnapcastService.ts";
+import {ConnectionStatus, type ISnapcastService, SnapcastServiceFactory} from "../services/SnapcastService.ts";
 import {Snapcast} from "../snapcontrol.ts";
 import {masterPlayerSlice} from "./masterPlayerSlice.ts";
 import type {RootState} from "./store.ts";
+import {userSlice} from "./userSlice.ts";
+import {configurationSlice, type SnapserverConfig} from "./configurationSlice.ts";
 
 const name = "snapcast";
 
@@ -46,38 +41,41 @@ export const snapcastSlice = createSlice({
         },
         setClientVolume: (_, __: PayloadAction<{ volume: number, clientId: string }>) => {
         },
-
     }
 })
 
 export const createSnapcastMiddleware = (): Middleware => {
-    const snapcast = new SnapcastService();
-    const connect = (url: string): void => {
-        snapcast.disconnect();
-        if (!URL.canParse(url)) {
-            return;
-        }
-        snapcast.connect(url);
-    }
-
     return (store: MiddlewareAPI<Dispatch<UnknownAction>, RootState>) => {
-        snapcast.on(SnapcastNotificationType.ON_CONNECTION_STATUS, (notification: ISnapcastNotificationPayload) => {
-            const payload = notification as SnapcastConnectionStatusPayload;
-            if (payload.connectionStatus === ConnectionStatus.CONNECTED) {
-                store.dispatch(snapcastSlice.actions.connected());
-            } else {
-                store.dispatch(snapcastSlice.actions.disconnected());
+        const connect = (url: string): void => {
+            snapcast.disconnect();
+            if (!URL.canParse(url)) {
+                return;
             }
-        })
-        snapcast.on(SnapcastNotificationType.ON_SNAPSERVER, (notification: ISnapcastNotificationPayload) => {
-            const payload = notification as SnapcastServerPayload;
-            store.dispatch(snapcastSlice.actions.setSnapserver(Snapcast.Mapper.toServer(payload.snapserver)));
-        })
+            snapcast.connect(url);
+        }
+
+        const createSnapcastService = (isClientLocal?: boolean): ISnapcastService => {
+            const snapcast: ISnapcastService = isClientLocal != null ? SnapcastServiceFactory.create(isClientLocal.valueOf()) :
+                SnapcastServiceFactory.stub();
+            snapcast.on('connectionStatus', (status: ConnectionStatus) => {
+                if (status === ConnectionStatus.CONNECTED) {
+                    store.dispatch(snapcastSlice.actions.connected());
+                } else {
+                    store.dispatch(snapcastSlice.actions.disconnected());
+                }
+            })
+            snapcast.on('snapserver', (snapserver: Snapcast.Server) => {
+                store.dispatch(snapcastSlice.actions.setSnapserver(Snapcast.Mapper.toServer(snapserver)));
+            });
+            return snapcast;
+        }
+
+        let snapcast: ISnapcastService = createSnapcastService();
+
         return (next) => (action) => {
             if (snapcastSlice.actions.connect.match(action)) {
                 connect(action.payload as string);
             }
-
             if (snapcastSlice.actions.setClientMuted.match(action)) {
                 if (snapcast.connected) {
                     snapcast.setMutedClient(action.payload.clientId, action.payload.muted);
@@ -89,25 +87,31 @@ export const createSnapcastMiddleware = (): Middleware => {
                     snapcast.setVolumeClient(action.payload.clientId, action.payload.volume);
                 }
             }
-
             if (masterPlayerSlice.actions.setMasterVolume.match(action)) {
                 if (snapcast.connected) {
-                    snapcast.snapserver.groups.forEach(group => {
-                        group.clients.forEach(client => {
-                            snapcast.setVolumeClient(client.id, action.payload.volume);
-                        })
-                    })
+                    snapcast.setVolumeAllClients(action.payload.volume);
                 }
             }
-
             if (masterPlayerSlice.actions.setMasterMuted.match(action)) {
                 if (snapcast.connected) {
-                    snapcast.snapserver.groups.forEach(group => {
-                        group.clients.forEach(client => {
-                            snapcast.setMutedClient(client.id, action.payload.muted);
-                        })
-                    })
+                    snapcast.setMutedAllClients(action.payload.muted);
                 }
+            }
+            if (userSlice.actions.setUserData.match(action)) {
+                if (snapcast.connected) {
+                    snapcast.disconnect();
+                }
+                snapcast = createSnapcastService(action.payload.isLocal);
+                snapcast.connect(store.getState().snapcast.url);
+            }
+            if (configurationSlice.actions.setSnapserverConfiguration.match(action)) {
+                const config = action.payload as SnapserverConfig;
+                const url = `ws://${store.getState().configuration.host}:${config.ports.http}`;
+
+                store.dispatch({
+                    type: snapcastSlice.actions.connect.type,
+                    payload: url
+                });
             }
             return next(action);
         }

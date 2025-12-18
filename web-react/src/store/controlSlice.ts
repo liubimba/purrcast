@@ -7,22 +7,18 @@ import {
     type UnknownAction
 } from "@reduxjs/toolkit";
 import {masterPlayerSlice} from "./masterPlayerSlice.ts";
-import {
-    type ControlConnectionStatusMessage,
-    ControlService,
-    IControlMessageType,
-    type MasterPlayerControlMessage
-} from "../services/ControlService.ts";
+import {ControlService} from "../services/ControlService.ts";
 import {SnapStream} from "../snapstream.ts";
 import {ConnectionStatus} from "../services/SnapcastService.ts";
 import AsyncLock from "async-lock"
 import type {RootState} from "./store.ts";
+import {userSlice} from "./userSlice.ts";
 
 const name = "control"
 
 const initialState = {
     url: "ws://127.0.0.1:8080" as string,
-    connected: false as boolean,
+    connected: false as boolean
 }
 
 export const controlSlice = createSlice({
@@ -46,24 +42,30 @@ export const createControlMiddleware = (): Middleware => {
     const lock = new AsyncLock();
 
     return (store: MiddlewareAPI<Dispatch<UnknownAction>, RootState>) => {
-        service.on(IControlMessageType.CONNECTION_STATUS, (notification) => {
-            const data = notification as ControlConnectionStatusMessage;
-            if (data.message.payload.status == ConnectionStatus.CONNECTED) {
+        service.on("connectionStatus", (status: string) => {
+            if (status === ConnectionStatus.CONNECTED) {
                 store.dispatch(controlSlice.actions.connected());
             } else {
                 store.dispatch(controlSlice.actions.disconnected());
             }
         })
-        service.on(IControlMessageType.MASTER_PLAYER, (notification) => {
-            const data = notification as MasterPlayerControlMessage;
+        service.on("masterPlayer", (volume: number, muted: boolean) => {
             store.dispatch({
                 type: masterPlayerSlice.actions.setMasterState.type,
                 payload: {
                     state: {
-                        volume: data.message.payload.volume,
-                        muted: data.message.payload.muted,
+                        volume: volume,
+                        muted: muted,
                     },
                     remote: true
+                }
+            })
+        })
+        service.on("userData", (isLocal: boolean) => {
+            store.dispatch({
+                type: userSlice.actions.setUserData.type,
+                payload: {
+                    isLocal: isLocal,
                 }
             })
         })
@@ -94,7 +96,11 @@ export const createControlMiddleware = (): Middleware => {
                 }
                 return result;
             }
+            if (userSlice.actions.setStarted.match(action)) {
+                if (action.payload.started) {
 
+                }
+            }
             return next(action);
         }
     }
