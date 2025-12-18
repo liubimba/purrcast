@@ -1,55 +1,58 @@
+import {EventEmitter} from "events";
+import {Logger} from "../logger/Logger.ts";
+import {LoggerFactory} from "../logger/LoggerFactory.ts";
+import {ConnectionStatus} from "./SnapcastService.ts";
+
 type CloseEvent = WebSocketEventMap["close"];
 type ErrorEvent = WebSocketEventMap["error"];
 
-import {Logger} from "../logger/Logger.ts";
-import {LoggerFactory} from "../logger/LoggerFactory.ts";
-import {Notifier} from "../notifier/notifier.ts";
-import {ConnectionStatus} from "./SnapcastService.ts";
+interface ControlServiceEvents {
+    connectionStatus: (status: ConnectionStatus) => void;
+    masterPlayer: (volume: number, muted: boolean) => void;
+    userData: (isLocal: boolean) => void;
+}
+
+export interface IControlService {
+    on<U extends keyof ControlServiceEvents>(
+        event: U,
+        listener: ControlServiceEvents[U]
+    ): this;
+
+    emit<U extends keyof ControlServiceEvents>(
+        event: U,
+        ...args: Parameters<ControlServiceEvents[U]>
+    ): boolean;
+}
 
 export const IControlMessageType = {
     MASTER_PLAYER: 'MASTER_PLAYER',
-    CONNECTION_STATUS: 'CONNECTION_STATUS',
-    MESSAGE: 'MESSAGE',
+    USER_DATA: 'USER_DATA'
 } as const;
+
 
 export type IControlMessageType =
     typeof IControlMessageType[keyof typeof IControlMessageType];
 
-
-export type IControlMessageData = {
+export type IControlMessage = {
     type: IControlMessageType;
     payload: object;
 }
 
-export type IControlMessage = {
-    user_id: string;
-    message: IControlMessageData;
-    internal_message_id: string;
-}
-
 export interface MasterPlayerControlMessage extends IControlMessage {
-    message: {
-        type: typeof IControlMessageType.MASTER_PLAYER;
-        payload: { volume: number; muted: boolean };
-    };
+    payload: { volume: number; muted: boolean };
 }
 
-export interface ControlConnectionStatusMessage extends IControlMessage {
-    message: {
-        type: typeof IControlMessageType.CONNECTION_STATUS;
-        payload: { status: ConnectionStatus };
-    };
+export interface UserDataControlMessage extends IControlMessage {
+    payload: { is_local: boolean };
 }
 
-export type NotifyUnion = IControlMessage | MasterPlayerControlMessage;
-
-export class ControlService {
+export class ControlService extends EventEmitter implements IControlService {
     private _id: string
     private _logger: Logger;
     private _websocket: WebSocket | null = null;
-    private _notifier: Notifier<IControlMessageType, NotifyUnion> = new Notifier<IControlMessageType, NotifyUnion>();
 
     public constructor(id: string) {
+        super();
         this._id = id;
         this._logger = LoggerFactory.getLogger("ControlService");
     }
@@ -59,71 +62,37 @@ export class ControlService {
         this._websocket = new WebSocket(url);
         this._websocket.onopen = (event: Event) => {
             this._logger.info("On open:", event);
-            this._notifier.notify(IControlMessageType.CONNECTION_STATUS, {
-                user_id: this._id,
-                internal_message_id: crypto.randomUUID(),
-                message: {
-                    type: IControlMessageType.CONNECTION_STATUS,
-                    payload: {
-                        status: ConnectionStatus.CONNECTED
-                    }
-                }
-            })
+            this.emit("connectionStatus", ConnectionStatus.CONNECTED);
         }
         this._websocket.onmessage = (messageEvent) => {
             this._logger.info("On message: ", messageEvent);
-            const json = JSON.parse(messageEvent.data) as IControlMessage;
-            this._notifier.notify(json.message.type, json);
+            const controlMessage = JSON.parse(messageEvent.data) as IControlMessage;
+            if (controlMessage.type === IControlMessageType.MASTER_PLAYER) {
+                const masterPlayerMessage = controlMessage as MasterPlayerControlMessage;
+                this.emit("masterPlayer", masterPlayerMessage.payload.volume, masterPlayerMessage.payload.muted);
+            } else if (controlMessage.type === IControlMessageType.USER_DATA) {
+                const userDataMessage = controlMessage as UserDataControlMessage;
+                this.emit("userData", userDataMessage.payload.is_local);
+            }
         }
         this._websocket.onclose = (closeEvent: CloseEvent) => {
             this._logger.info("On close event: ", closeEvent);
-            this._notifier.notify(IControlMessageType.CONNECTION_STATUS, {
-                user_id: this._id,
-                internal_message_id: crypto.randomUUID(),
-                message: {
-                    type: IControlMessageType.CONNECTION_STATUS,
-                    payload: {
-                        status: ConnectionStatus.DISCONNECTED
-                    }
-                }
-            })
+            this.emit("connectionStatus", ConnectionStatus.DISCONNECTED);
         }
         this._websocket.onerror = (event: ErrorEvent) => {
             this._logger.error("On error:", event);
-            this._notifier.notify(IControlMessageType.CONNECTION_STATUS, {
-                user_id: this._id,
-                internal_message_id: crypto.randomUUID(),
-                message: {
-                    type: IControlMessageType.CONNECTION_STATUS,
-                    payload: {
-                        status: ConnectionStatus.FAILED
-                    }
-                }
-            })
+            this.emit("connectionStatus", ConnectionStatus.FAILED);
         }
-        this._notifier.notify(IControlMessageType.CONNECTION_STATUS, {
-            user_id: this._id,
-            internal_message_id: crypto.randomUUID(),
-            message: {
-                type: IControlMessageType.CONNECTION_STATUS,
-                payload: {
-                    status: ConnectionStatus.CONNECTING
-                }
-            }
-        })
+        this.emit("connectionStatus", ConnectionStatus.CONNECTING);
     }
 
     public notifyMasterPlayerChanged(volume: number, muted: boolean) {
         if (this._websocket && this._websocket.readyState === WebSocket.OPEN) {
             const message: MasterPlayerControlMessage = {
-                user_id: this._id,
-                internal_message_id: crypto.randomUUID(),
-                message: {
-                    type: IControlMessageType.MASTER_PLAYER,
-                    payload: {
-                        volume: volume,
-                        muted: muted
-                    }
+                type: IControlMessageType.MASTER_PLAYER,
+                payload: {
+                    volume: volume,
+                    muted: muted
                 }
             };
             this._websocket.send(JSON.stringify(message));
@@ -131,11 +100,6 @@ export class ControlService {
             return;
         }
         throw new Error("ControlClient::send is unavailable, the channel is not configured")
-    }
-
-    public on(type: IControlMessageType, callback: (arg0: NotifyUnion) => void): ControlService {
-        this._notifier.add(type, callback);
-        return this;
     }
 
     public get connecting(): boolean {

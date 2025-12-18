@@ -165,7 +165,6 @@ struct settings
         {
             std::vector<std::string> dependsOn = {"snapserver"};
             std::string bin;
-            std::string args;
             int sinkIndex = -1;
 
             s_snapclient()
@@ -180,7 +179,7 @@ struct settings
             bool operator==(const s_snapclient& oth) const
             {
                 return dependsOn == oth.dependsOn && name == oth.name &&
-                    bin == oth.bin && args == oth.args && sinkIndex == oth.sinkIndex;
+                    bin == oth.bin && sinkIndex == oth.sinkIndex;
             }
         };
 

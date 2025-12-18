@@ -8,7 +8,7 @@ export default defineConfig({
         outDir: process.env.OUT_DIR || './dist',
     },
     server: {
-        host: '127.0.0.1',
+        host: '192.168.1.180',
     },
     plugins: [react(), tailwindcss(), vitePluginSvgr()]
 })

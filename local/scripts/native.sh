@@ -4,13 +4,14 @@
 SNAPSERVER_PID=""
 PAREC_PID=""
 CLIENT_PID=""
+ARTIFACTS_DIR=$1
 
 function startup_snapserver() {
-    snapserver_bin=snapserver
-    config_filepath=../configuration/snapserver.conf
+    snapserver_bin=${ARTIFACTS_DIR}/launcher-cpp/bin/snapserver
+    config_filepath=${ARTIFACTS_DIR}/config/snapserver.conf
 
     echo "Startup snapserver: $snapserver_bin --config $config_filepath"
-    snapserver --config ../configuration/snapserver.conf &
+    snapserver --config ${ARTIFACTS_DIR}/config/snapserver.conf &
     SNAPSERVER_PID=$!
     echo "Snapserver started with PID: $SNAPSERVER_PID"
 }
@@ -25,7 +26,7 @@ function cleanup_snapserver(){
 }
 
 function startup_client() {
-    ../cmake-build-debug/bin/snapclient --soundcard 32 &
+    ${ARTIFACTS_DIR}/launcher-cpp/bin/snapclient --soundcard 32 &
     CLIENT_PID=$!
     echo "Snapclient started with PID: $CLIENT_PID"
 }

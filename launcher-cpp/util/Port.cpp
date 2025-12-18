@@ -50,6 +50,8 @@ bool Port::isBound(int port)
         LOGGER_->error("Could not create socket");
         return false;
     }
+    int option = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void*)&option, sizeof(option));
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;

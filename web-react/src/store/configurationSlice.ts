@@ -8,9 +8,9 @@ import {
 } from "@reduxjs/toolkit";
 import {LoggerFactory} from "../logger/LoggerFactory.ts";
 import type {Logger} from "../logger/Logger.ts";
-import {snapcastSlice} from "./snapcastSlice.ts";
 import {controlSlice} from "./controlSlice.ts";
 import type {RootState} from "./store.ts";
+import {userSlice} from "./userSlice.ts";
 
 interface ConfigResponse {
     snapserver: SnapserverConfig;
@@ -116,8 +116,6 @@ export const createConfigurationMiddleware = (): Middleware => {
         };
         return (next) =>
             (action) => {
-
-
                 if (configurationSlice.actions.setHost.match(action) ||
                     configurationSlice.actions.setPort.match(action)) {
 
@@ -130,17 +128,6 @@ export const createConfigurationMiddleware = (): Middleware => {
                     connect(url);
                     return result;
                 }
-
-                if (configurationSlice.actions.setSnapserverConfiguration.match(action)) {
-                    const config = action.payload as SnapserverConfig;
-                    const url = `ws://${store.getState().configuration.host}:${config.ports.http}`;
-
-                    store.dispatch({
-                        type: snapcastSlice.actions.connect.type,
-                        payload: url
-                    });
-                }
-
                 if (configurationSlice.actions.setWebsocketConfiguration.match(action)) {
                     const config = action.payload as WebsocketConfig;
                     const url = `ws://${store.getState().configuration.host}:${config.port}${config.path}`;
@@ -150,7 +137,6 @@ export const createConfigurationMiddleware = (): Middleware => {
                         payload: url
                     });
                 }
-
                 if (configurationSlice.actions.connect.match(action)) {
                     const state = store.getState().configuration;
                     const api = `/api/config`;
@@ -158,7 +144,15 @@ export const createConfigurationMiddleware = (): Middleware => {
 
                     connect(url);
                 }
+                if (userSlice.actions.setStarted.match(action)) {
+                    if (action.payload.started) {
+                        const state = store.getState().configuration;
+                        const api = `/api/config`;
+                        const url = `http://${state.host}:${state.port}${api}`;
 
+                        connect(url);
+                    }
+                }
                 return next(action);
             };
     };
