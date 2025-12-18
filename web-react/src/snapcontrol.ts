@@ -487,35 +487,29 @@ class SnapControl {
     }
 
     private onMessage(msg: string) {
-        let refresh: boolean = false;
         const json_msg = JSON.parse(msg);
         const is_response: boolean = (json_msg.id !== undefined);
         // console.debug("Received " + (is_response ? "response" : "notification") + ", json: " + JSON.stringify(json_msg))
         if (is_response) {
             if (json_msg.id === this.status_req_id) {
                 this.server = Snapcast.Mapper.toServer(json_msg.result.server);
-                refresh = true;
             }
         } else {
             if (Array.isArray(json_msg)) {
                 for (const notification of json_msg) {
-                    refresh = this.onNotification(notification) || refresh;
+                    this.onNotification(notification);
                 }
             } else {
-                refresh = this.onNotification(json_msg);
+                this.onNotification(json_msg);
             }
-            refresh = true;
 
             // TODO: don't update everything, but only the changed, 
             // e.g. update the values for the volume sliders
             // if (refresh)
             //     show();
         }
-        if (refresh) {
-            if (this.onChange) {
-                this.onChange(this, this.server);
-            } else {
-            }
+        if (this.onChange) {
+            this.onChange(this, this.server);
         }
     }
 
