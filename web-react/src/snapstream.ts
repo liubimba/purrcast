@@ -925,7 +925,7 @@ class SnapStream {
 
             this.ctx = new AudioContextPatched(options);
             this.ctx.addEventListener("statechange", (state: Event) => {
-                this._logger.info("AudioContext changed state to: ", this.ctx.state);
+                this._logger.info("AudioContext changed state to: ", this.ctx.state, state);
             })
             this.gainNode = this.ctx.createGain();
             this.gainNode.connect(this.ctx.destination);
