@@ -40,7 +40,7 @@ public:
     bool unload() override;
     [[nodiscard]] bool loaded() const override;
     [[nodiscard]] std::string name() const override;
-    [[nodiscard]] ModuleParams getParams() const override;
+    [[nodiscard]] ModuleParams get_params() const override;
 
 private:
     static PcmDevice resolveAudioDeviceName_(int sinkIndex);

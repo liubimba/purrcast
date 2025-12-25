@@ -72,6 +72,13 @@ add_executable(multiroom
         modules/router/AudioRouterModule.cpp
         settings/SettingsObservable.cpp
         modules/server/ServerModule.cpp
+        modules/monitor/MonitorModule.cpp
+        modules/monitor/MonitorModule.hpp
+        modules/monitor/MonitorSession.cpp
+        modules/monitor/MonitorSession.hpp
+        modules/ModuleStatus.hpp
+        modules/monitor/MonitorSessionListener.hpp
+        modules/monitor/MonitorReportMessage.hpp
 )
 
 set_target_properties(snapserver PROPERTIES

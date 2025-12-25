@@ -119,7 +119,7 @@ std::string SnapserverModule::name() const
     return "snapserver";
 }
 
-ModuleParams SnapserverModule::getParams() const
+ModuleParams SnapserverModule::get_params() const
 {
     if (!loaded()) throw std::runtime_error("SnapserverModule getParams is not loaded");
     return params_;

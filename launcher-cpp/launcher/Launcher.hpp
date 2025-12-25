@@ -26,7 +26,7 @@ public:
     void shutdown();
 
 private:
-    void launch_(const struct settings& settings);
+    void launch_(const struct settings& settings, boost::asio::io_context& io_context);
 
     boost::mutex mutex_;
     boost::condition condition_;

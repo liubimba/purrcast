@@ -16,7 +16,7 @@ public:
     bool unload() override;
     bool loaded() const override;
     std::string name() const override;
-    ModuleParams getParams() const override;
+    ModuleParams get_params() const override;
 
 private:
     std::mutex mutex_;

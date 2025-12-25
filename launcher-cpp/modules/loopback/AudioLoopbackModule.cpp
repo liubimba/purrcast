@@ -44,9 +44,9 @@ std::string AudioLoopbackModule::name() const
     return internalModule_->name();
 }
 
-ModuleParams AudioLoopbackModule::getParams() const
+ModuleParams AudioLoopbackModule::get_params() const
 {
-    return internalModule_->getParams();
+    return internalModule_->get_params();
 }
 
 uint32_t AudioLoopbackModule::getSinkIndex()

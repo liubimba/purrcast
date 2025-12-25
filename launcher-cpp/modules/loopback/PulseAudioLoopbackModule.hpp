@@ -16,8 +16,6 @@
 #include "../../logger/LoggerFactory.hpp"
 #include "absl/time/time.h"
 
-#define OK 0
-
 #define PA_CONTEXT_STATE_LIST(X) \
 X(PA_CONTEXT_UNCONNECTED)       \
 X(PA_CONTEXT_CONNECTING)        \
@@ -75,7 +73,7 @@ namespace pulse
         std::string getMonitorDescription() override;
         uint32_t getSinkIndex() override;
         std::string name() const override;
-        ModuleParams getParams() const override;
+        ModuleParams get_params() const override;
 
     private:
         bool resolveContext_();
