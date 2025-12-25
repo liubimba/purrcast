@@ -7,6 +7,7 @@
 #include <variant>
 #include <boost/chrono/ceil.hpp>
 
+#include "../libs/snapcast/common/json.hpp"
 #include "../modules/ModuleDescription.hpp"
 #include "absl/log/internal/config.h"
 #include "absl/strings/str_format.h"
@@ -31,8 +32,35 @@ struct settings
         s_interval interval;
     };
 
+
     struct s_module
     {
+        struct s_monitor : module_description
+        {
+            std::string address;
+            int interval;
+            int port;
+
+            s_monitor(): interval(0), port(0)
+            {
+                name = "monitor";
+            }
+
+            bool operator==(const s_monitor& other) const
+            {
+                return other.address == address && other.port == port && other.interval == interval;
+            }
+
+            std::string to_string() const override
+            {
+                nlohmann::json j = module_description::to_json();
+                j["address"] = address;
+                j["interval"] = interval;
+                j["port"] = port;
+                return j.dump();
+            }
+        };
+
         struct s_server : module_description
         {
             std::string bin;
@@ -50,6 +78,15 @@ struct settings
             bool operator==(const s_server& other) const
             {
                 return bin == other.bin && port == other.port;
+            }
+
+            std::string to_string() const override
+            {
+                nlohmann::json j = module_description::to_json();
+                j["bin"] = bin;
+                j["port"] = port;
+                j["static_dir"] = static_dir;
+                return j.dump();
             }
         };
 
@@ -74,6 +111,18 @@ struct settings
                     dependsOn == oth.dependsOn && framesPerBuffer == oth.framesPerBuffer && sampleRate == oth.sampleRate
                     && channels == oth.channels;
             }
+
+            std::string to_string() const override
+            {
+                nlohmann::json j = module_description::to_json();
+                j["virtualSink"] = virtualSinkName;
+                j["name"] = name;
+                j["dependsOn"] = dependsOn;
+                j["framesPerBuffer"] = framesPerBuffer;
+                j["sampleRate"] = sampleRate;
+                j["channels"] = channels;
+                return j.dump();
+            }
         };
 
         struct s_router : module_description
@@ -90,6 +139,16 @@ struct settings
                     return name == oth.name && framesPerBuffer == oth.framesPerBuffer && sampleRate == oth.sampleRate &&
                         channels == oth.channels;
                 }
+
+                nlohmann::json to_json() const
+                {
+                    nlohmann::json j;
+                    j["name"] = name;
+                    j["framesPerBuffer"] = framesPerBuffer;
+                    j["sampleRate"] = sampleRate;
+                    j["channels"] = channels;
+                    return j;
+                }
             };
 
             struct s_sink
@@ -104,6 +163,16 @@ struct settings
                     return name == oth.name && framesPerBuffer == oth.framesPerBuffer && sampleRate == oth.sampleRate &&
                         channels == oth.channels;
                 }
+
+                nlohmann::json to_json() const
+                {
+                    nlohmann::json j;
+                    j["name"] = name;
+                    j["framesPerBuffer"] = framesPerBuffer;
+                    j["sampleRate"] = sampleRate;
+                    j["channels"] = channels;
+                    return j;
+                }
             };
 
             s_router(): s_router({}, {})
@@ -113,7 +182,7 @@ struct settings
             s_router(s_source source, s_sink sink): source(std::move(source)), sink(std::move(sink))
             {
                 name = "router";
-                dependsOn.assign({"loopback", "snapserver"});
+                dependsOn.assign({"loopback"});
             }
 
             s_router(const s_router& oth) = default;
@@ -125,6 +194,14 @@ struct settings
             bool operator==(const s_router& oth) const
             {
                 return dependsOn == oth.dependsOn && source == oth.source && sink == oth.sink;
+            }
+
+            std::string to_string() const override
+            {
+                nlohmann::json j = module_description::to_json();
+                j["source"] = source.to_json();
+                j["sink"] = sink.to_json();
+                return j.dump();
             }
         };
 
@@ -140,6 +217,15 @@ struct settings
                 {
                     return oth.http == http && oth.stream == stream && oth.control == control;
                 }
+
+                nlohmann::json to_json() const
+                {
+                    nlohmann::json j;
+                    j["http"] = http;
+                    j["stream"] = stream;
+                    j["control"] = control;
+                    return j;
+                }
             };
 
             std::string bin;
@@ -149,6 +235,7 @@ struct settings
             s_snapserver()
             {
                 name = "snapserver";
+                dependsOn = {"router"};
             }
 
             s_snapserver(const s_snapserver& oth) = default;
@@ -158,6 +245,15 @@ struct settings
             {
                 return dependsOn == oth.dependsOn && bin == oth.bin && config == oth.config &&
                     ports == oth.ports;
+            }
+
+            std::string to_string() const override
+            {
+                nlohmann::json j = module_description::to_json();
+                j["bin"] = bin;
+                j["config"] = config;
+                j["ports"] = ports.to_json();
+                return j.dump();
             }
         };
 
@@ -181,6 +277,15 @@ struct settings
                 return dependsOn == oth.dependsOn && name == oth.name &&
                     bin == oth.bin && sinkIndex == oth.sinkIndex;
             }
+
+            std::string to_string() const override
+            {
+                nlohmann::json j = module_description::to_json();
+                j["dependsOn"] = dependsOn;
+                j["bin"] = bin;
+                j["sinkIndex"] = sinkIndex;
+                return j.dump();
+            }
         };
 
         s_server server;
@@ -188,6 +293,7 @@ struct settings
         s_loopback loopback;
         s_snapserver snapserver;
         s_snapclient snapclient;
+        s_monitor monitor;
     };
 
     s_log log;
@@ -200,14 +306,15 @@ using ModuleParams = std::variant<
     settings::s_module::s_loopback,
     settings::s_module::s_snapserver,
     settings::s_module::s_snapclient,
-    settings::s_module::s_server
+    settings::s_module::s_server,
+    settings::s_module::s_monitor
 >;
 
-inline module_description module_cast(const ModuleParams& params)
+inline const module_description& module_cast(const ModuleParams& params)
 {
-    return std::visit([](auto&& mod)
+    return std::visit([](const auto& mod) -> const module_description&
     {
-        return static_cast<module_description>(mod);
+        return mod;
     }, params);
 }
 

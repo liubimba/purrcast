@@ -92,7 +92,7 @@ std::string ServerModule::name() const
         return "server";
 }
 
-ModuleParams ServerModule::getParams() const
+ModuleParams ServerModule::get_params() const
 {
         return params_;
 }

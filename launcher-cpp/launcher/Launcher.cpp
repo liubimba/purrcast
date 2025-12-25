@@ -4,6 +4,8 @@
 
 #include "Launcher.hpp"
 
+#include "../modules/monitor/MonitorModule.hpp"
+
 
 Launcher::Launcher()
 = default;
@@ -15,12 +17,12 @@ void Launcher::launch(const struct settings& params)
     boost::asio::signal_set signals(io_context, SIGINT, SIGTERM, SIGQUIT);
     signals.async_wait([&](const boost::system::error_code&, int)
     {
-        this->shutdown();
-        io_context.stop();
+        condition_.notify_all();
     });
     boost::thread t([&]
     {
-        this->launch_(params);
+        launch_(params, io_context);
+        io_context.stop();
     });
     io_context.run();
     t.join();
@@ -29,15 +31,16 @@ void Launcher::launch(const struct settings& params)
 void Launcher::shutdown()
 {
     spdlog::info("Shutdown");
-    manager_->shutdown();
     condition_.notify_all();
 }
 
-void Launcher::launch_(const settings& settings)
+void Launcher::launch_(const settings& settings, boost::asio::io_context& io_context)
 {
     Services services;
     services.add(std::make_shared<LoggerFactory>());
     services.add(std::make_shared<pulse::MainloopService>(&services));
+
+    manager_ = std::make_unique<ModuleManager>(&services);
 
     AudioRouterModule routerModule(&services);
     InternalHealthChecker routerChecker(&routerModule, &services);
@@ -81,15 +84,26 @@ void Launcher::launch_(const settings& settings)
     serverSession.params = settings.module.server;
 
 
-    manager_ = std::make_unique<ModuleManager>(&services);
+    MonitorModule monitorServer{io_context, manager_.get(), &services};
+    TCPHealthChecker monitorChecker(&monitorServer, &services, {
+                                        settings.module.monitor.port
+                                    });
+    ModuleSession monitorSession;
+    monitorSession.checker = &monitorChecker;
+    monitorSession.module = &monitorServer;
+    monitorSession.params = settings.module.monitor;
+
     manager_->add(routerSession);
     manager_->add(loopbackSession);
     manager_->add(snapserverSession);
     manager_->add(snapclientSession);
     manager_->add(serverSession);
+    manager_->add(monitorSession);
 
     manager_->startup(settings.manager);
 
     boost::unique_lock lock(mutex_);
     condition_.wait(lock);
+
+    manager_->shutdown();
 }

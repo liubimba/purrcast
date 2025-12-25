@@ -22,7 +22,7 @@
 #include "../router/AudioRouterModule.hpp"
 #include "../../health_checker/InternalHealthChecker.hpp"
 #include "../../health_checker/TcpHealthChecker.hpp"
-
+#include "../ModuleStatus.hpp"
 
 class ModuleManager
 {
@@ -32,6 +32,7 @@ public:
     void startup(const settings::s_manager& params);
     void shutdown();
     bool running();
+    std::vector<ModuleStatus> report();
 
 private:
     void run_(settings::s_manager params);

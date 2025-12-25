@@ -27,6 +27,15 @@ int main(int argc, char** argv)
       parser.add_argument("--server.static_dir")
             .help("Path to static directory")
             .required();
+      parser.add_argument("--monitor.port")
+            .help("Port to bind for monitoring")
+            .required();
+      parser.add_argument("--monitor.address")
+            .help("Monitor address to bind")
+            .default_value("0.0.0.0");
+      parser.add_argument("--monitor.interval")
+            .help("Interval between monitoring in milliseconds")
+            .default_value("1000");
 
       try
       {
@@ -42,6 +51,10 @@ int main(int argc, char** argv)
 
             settings.module.snapserver.bin = parser.get<std::string>("--snapserver.path");
             settings.module.snapserver.config = parser.get<std::string>("--snapserver.config");
+
+            settings.module.monitor.interval = std::atoi(parser.get<std::string>("--monitor.interval").c_str());
+            settings.module.monitor.address = parser.get<std::string>("--monitor.address");
+            settings.module.monitor.port = std::atoi(parser.get<std::string>("--monitor.port").c_str());
 
             Launcher launcher;
             launcher.launch(settings);

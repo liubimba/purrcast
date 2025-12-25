@@ -28,7 +28,7 @@ namespace pulse
     {
         if (user == nullptr) return;
         auto request = static_cast<Request*>(user);
-        request->status = success == 1 ? OK : -1;
+        request->status = success == 1 ? 0 : -1;
         pa_threaded_mainloop_signal(request->mainloop, 0);
     }
 
@@ -37,7 +37,7 @@ namespace pulse
         if (user == nullptr) return;
         auto* request = static_cast<Request*>(user);
         request->data = server;
-        request->status = OK;
+        request->status = 0;
         pa_threaded_mainloop_signal(request->mainloop, 1);
     }
 
@@ -47,7 +47,7 @@ namespace pulse
             return;
         auto request = static_cast<Request*>(user);
         request->data = sink;
-        request->status = OK;
+        request->status = 0;
         pa_threaded_mainloop_signal(request->mainloop, 1);
     }
 
@@ -57,7 +57,7 @@ namespace pulse
             return;
         auto request = static_cast<Request*>(user);
         request->data = source;
-        request->status = OK;
+        request->status = 0;
         pa_threaded_mainloop_signal(request->mainloop, 1);
     }
 
@@ -203,7 +203,7 @@ namespace pulse
         return "pulse-loopback";
     }
 
-    ModuleParams AudioLoopbackModule::getParams() const
+    ModuleParams AudioLoopbackModule::get_params() const
     {
         if (!loaded()) throw std::runtime_error("AudioLoopbackModule is not loaded");
         return params_;
@@ -292,7 +292,7 @@ namespace pulse
                 .defaultSinkName = serverInfo->default_sink_name ? serverInfo->default_sink_name : "",
                 .defaultSourceName = serverInfo->default_source_name ? serverInfo->default_source_name : ""
             };
-            request.status = OK;
+            request.status = 0;
         }
         else
         {
@@ -302,7 +302,7 @@ namespace pulse
         pa_operation_unref(operation);
         pa_threaded_mainloop_accept(mainloop);
         pa_threaded_mainloop_unlock(mainloop);
-        return request.status == OK;
+        return request.status == 0;
     }
 
     bool AudioLoopbackModule::resolveAlsaDeviceIndex_()
@@ -418,7 +418,7 @@ namespace pulse
         while (pa_operation_get_state(operation) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait(mainloop);
         if (pa_operation_get_state(operation) == PA_OPERATION_DONE)
         {
-            if (request.status == OK)
+            if (request.status == 0)
                 logger_->info(
                     "Operation to set as default output module null sink completed successfully");
             else
@@ -429,7 +429,7 @@ namespace pulse
             logger_->error("The operation to set as default output module null sink was unexpectedly interrupted");
         pa_operation_unref(operation);
         pa_threaded_mainloop_unlock(mainloop);
-        return request.status == OK;
+        return request.status == 0;
     }
 
     bool AudioLoopbackModule::waitUntilSetAsApply_(const settings::s_module::s_loopback& params, uint32_t retries,
@@ -441,7 +441,7 @@ namespace pulse
         request.data = nullptr;
         request.mainloop = mainloop;
         pa_threaded_mainloop_lock(mainloop);
-        for (uint32_t i = 0; i < retries && request.data == OK; i++)
+        for (uint32_t i = 0; i < retries && request.data == 0; i++)
         {
             pa_operation* operation = pa_context_get_server_info(context_, serverInfoCb, &request);
             if (!operation)
@@ -458,7 +458,7 @@ namespace pulse
                 if (params.virtualSinkName == serverInfo->default_sink_name)
                 {
                     logger_->info("Server successfully installed as virtual");
-                    request.status = OK;
+                    request.status = 0;
                 }
                 else
                 {
@@ -474,7 +474,7 @@ namespace pulse
             absl::SleepFor(timeout);
         }
         pa_threaded_mainloop_unlock(mainloop);
-        return request.status == OK;
+        return request.status == 0;
     }
 
     void AudioLoopbackModule::unloadSafely_()
@@ -503,7 +503,7 @@ namespace pulse
                     if (pa_operation_get_state(operation) == PA_OPERATION_CANCELED)
                         logger_->
                             error("Operation canceled");
-                    else if (request.status == OK) logger_->info("Operation completed successfully");
+                    else if (request.status == 0) logger_->info("Operation completed successfully");
                     else logger_->info("Operation failed with status: {}", request.status);
                 }
                 pa_threaded_mainloop_unlock(mainloop);

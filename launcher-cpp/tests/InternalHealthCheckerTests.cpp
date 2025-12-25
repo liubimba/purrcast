@@ -34,7 +34,7 @@ public:
         return TestData::uuid();
     }
 
-    ModuleParams getParams() const override
+    ModuleParams get_params() const override
     {
         return {};
     }

@@ -15,7 +15,7 @@ ModuleManager::ModuleManager(const Services* services):
 
 void ModuleManager::add(const ModuleSession& session)
 {
-    module_description description = module_cast(session.params);
+    const module_description& description = module_cast(session.params);
     sessions_.insert({description.name, session});
     logger_->info("Add module session: {}", description.name);
 }
@@ -38,6 +38,16 @@ void ModuleManager::shutdown()
 bool ModuleManager::running()
 {
     return running_.load();
+}
+
+std::vector<ModuleStatus> ModuleManager::report()
+{
+    std::vector<ModuleStatus> result;
+    for (const auto session : sessions_)
+    {
+        result.emplace_back(session.second.module->get_last_status());
+    }
+    return result;
 }
 
 void ModuleManager::run_(struct settings::s_manager params)
@@ -69,6 +79,20 @@ void ModuleManager::run_(struct settings::s_manager params)
             lookUpLast = now;
         }
     }
+    for (const auto& session : sessions_)
+    {
+        auto module = session.second.module;
+        if (module->loaded())
+        {
+            try
+            {
+                module->unload();
+            }
+            catch (std::exception& e)
+            {
+            }
+        }
+    }
 }
 
 bool ModuleManager::lookUpSessionsState_()
@@ -77,7 +101,7 @@ bool ModuleManager::lookUpSessionsState_()
     std::unordered_set<std::string> unhealthyModules;
     for (auto& [moduleName, session] : sessions_)
     {
-        module_description description = module_cast(session.params);
+        const module_description& description = module_cast(session.params);
         if (session.checker->checkStatus() == HealthStatus::HEALTHY)
         {
             if (!dependentHealthy(session))
@@ -91,7 +115,7 @@ bool ModuleManager::lookUpSessionsState_()
                 if (runningWithSameParameters_(session)) continue;
                 if (tryReload(session))
                 {
-                    session.params = session.module->getParams();
+                    session.params = session.module->get_params();
                     continue;
                 }
             }
@@ -122,7 +146,7 @@ bool ModuleManager::lookUpSessionsState_()
 
 bool ModuleManager::dependentHealthy(const ModuleSession& session)
 {
-    module_description description = module_cast(session.params);
+    const module_description& description = module_cast(session.params);
     return std::all_of(description.dependsOn.begin(), description.dependsOn.end(),
                        [this](const std::string& dependentModuleName)
                        {
@@ -135,7 +159,7 @@ bool ModuleManager::dependentHealthy(const ModuleSession& session)
 bool ModuleManager::tryLoad_(const ModuleSession& session)
 {
     std::unordered_set<std::string> unhealthyDependentModules;
-    module_description description = module_cast(session.params);
+    const module_description& description = module_cast(session.params);
     for (const std::string& dependentModuleName : description.dependsOn)
     {
         if (!sessions_.count(dependentModuleName))
@@ -165,7 +189,7 @@ bool ModuleManager::tryReload(const ModuleSession& session)
 
 void ModuleManager::extraActions_(const ModuleSession& session)
 {
-    module_description description = module_cast(session.params);
+    const module_description& description = module_cast(session.params);
 
     if (description.name == "loopback")
     {
@@ -180,5 +204,5 @@ void ModuleManager::extraActions_(const ModuleSession& session)
 
 bool ModuleManager::runningWithSameParameters_(const ModuleSession& session)
 {
-    return session.module->getParams() == session.params;
+    return session.module->get_params() == session.params;
 }

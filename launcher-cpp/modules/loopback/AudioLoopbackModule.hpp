@@ -19,7 +19,7 @@ public:
     bool unload() override;
     bool loaded() const override;
     std::string name() const override;
-    ModuleParams getParams() const override;
+    ModuleParams get_params() const override;
     uint32_t getSinkIndex() override;
     std::string getMonitorDescription() override;
 

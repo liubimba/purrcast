@@ -72,7 +72,7 @@ bool SnapclientModule::unload()
 {
     logger_->info("Request to unload");
     if (!loaded())
-        throw std::runtime_error("SnapclientModule already loaded to unload");
+        throw std::runtime_error("SnapclientModule is not loaded to unload");
     std::unique_lock lock(mutex_);
     if (p_snapclientProcess->terminate())
     {
@@ -94,7 +94,7 @@ std::string SnapclientModule::name() const
     return "snapclient";
 }
 
-ModuleParams SnapclientModule::getParams() const
+ModuleParams SnapclientModule::get_params() const
 {
     if (!loaded()) throw std::runtime_error("getParams is not loaded");
     return params_;

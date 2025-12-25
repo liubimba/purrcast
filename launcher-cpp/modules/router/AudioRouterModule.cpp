@@ -122,7 +122,7 @@ std::string AudioRouterModule::name() const
     return "router";
 }
 
-ModuleParams AudioRouterModule::getParams() const
+ModuleParams AudioRouterModule::get_params() const
 {
     if (!loaded()) throw std::runtime_error("getParams is not loaded");
     return params_;
