@@ -57,7 +57,7 @@ bool SnapserverModule::load(const ModuleParams& moduleParams)
     std::unique_lock lock(mutex_);
     std::unique_ptr<Process> p_process = std::make_unique<Process>(services_, "snapserver");
     logger_->info("Executing snapserver process");
-    if (p_process->execute(params.bin, args))
+    if (p_process->execute(params.path_to_binary, args))
     {
         logger_->info("Successfully executed snapserver process");
         p_snapserverProcess_ = std::move(p_process);

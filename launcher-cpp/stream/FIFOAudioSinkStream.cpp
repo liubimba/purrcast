@@ -57,13 +57,13 @@ bool FIFOAudioSinkStream::started()
     return fifo_.is_open();
 }
 
-void FIFOAudioSinkStream::receive(const AudioChunk& chunk)
+void FIFOAudioSinkStream::receive(const audio_chunk& chunk)
 {
     if (fifo_.is_open())
     {
         logger_->debug("Write chunk to {}", params_.name);
 
-        fifo_.write(reinterpret_cast<const char*>(chunk.data), chunk.size);
+        fifo_.write(static_cast<const char*>(chunk.data), chunk.bytes());
     }
     else
     {

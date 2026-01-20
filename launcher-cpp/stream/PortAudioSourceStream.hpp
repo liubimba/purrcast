@@ -4,9 +4,10 @@
 
 #ifndef PORTAUDIOSOURCESTREAM_HPP
 #define PORTAUDIOSOURCESTREAM_HPP
+#include "IAudioSource.hpp"
 #include "IAudioSourceStream.hpp"
+#include "IAudioStream.hpp"
 #include "portaudio.h"
-
 
 class PortAudioSourceStream : public IAudioSourceStream
 {
@@ -23,7 +24,7 @@ public:
     bool start(const AudioStreamParameters& parameters) override;
     bool stop() override;
     bool started() override;
-    void send(const AudioChunk& chunk) override;
+    void send(const audio_chunk& chunk) override;
 
 private:
     int callback_(

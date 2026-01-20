@@ -46,20 +46,20 @@ TEST(TCPHealthChecker, status)
     module.m_loaded = false;
     std::initializer_list<int> ports = {1780, 1781};
     TCPHealthChecker checker(&module, TestData::services(), ports);
-    ASSERT_EQ(checker.checkStatus(), HealthStatus::UNHEALTHY);
+    ASSERT_EQ(checker.check(), health_status::unhealthy);
     module.m_loaded = true;
-    ASSERT_EQ(checker.checkStatus(), HealthStatus::UNHEALTHY);
+    ASSERT_EQ(checker.check(), health_status::unhealthy);
     std::vector<std::shared_ptr<Port>> boundPorts;
     for (auto it = ports.begin(); it != ports.end(); ++it)
     {
         boundPorts.push_back(Port::bind(*it));
         if (std::distance(it, ports.end()) == 1)
         {
-            ASSERT_EQ(checker.checkStatus(), HealthStatus::HEALTHY);
+            ASSERT_EQ(checker.check(), health_status::healthy);
         }
         else
         {
-            ASSERT_EQ(checker.checkStatus(), HealthStatus::UNHEALTHY);
+            ASSERT_EQ(checker.check(), health_status::unhealthy);
         }
     }
 

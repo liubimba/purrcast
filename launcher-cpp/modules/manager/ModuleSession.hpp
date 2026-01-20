@@ -19,6 +19,6 @@ typedef struct ModuleSession
     {
         return params == other.params && module == other.module && checker == other.checker;
     }
-} ModuleSession;
+} module_session;
 
 #endif //MODULESESSION_HPP

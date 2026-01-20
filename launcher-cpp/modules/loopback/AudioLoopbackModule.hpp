@@ -12,7 +12,7 @@
 class AudioLoopbackModule : public IAudioLoopbackModule
 {
 public:
-    AudioLoopbackModule(const Services* services);
+    AudioLoopbackModule(const Services* services, const std::string& id = "");
     ~AudioLoopbackModule() override;
     bool load(const ModuleParams& params) override;
     bool reload(const ModuleParams& params) override;
@@ -20,12 +20,17 @@ public:
     bool loaded() const override;
     std::string name() const override;
     ModuleParams get_params() const override;
-    uint32_t getSinkIndex() override;
-    std::string getMonitorDescription() override;
+    std::string get_origin_alsa_device() override;
+    std::string get_loopback_monitor_description() override;
+    std::string get_loopback_alsa_device() override;
+    std::string get_loopback_description() override;
+    audio_device get_origin_device() override;
+    audio_device get_loopback_device() override;
+    audio_device get_loopback_monitor_device() override;
 
 private:
     const Services* services_;
-    std::unique_ptr<IAudioLoopbackModule> internalModule_;
+    std::unique_ptr<IAudioLoopbackModule> internal_;
 };
 
 

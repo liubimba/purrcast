@@ -171,7 +171,7 @@ bool MonitorModule::loaded() const
 
 std::string MonitorModule::name() const
 {
-    return params_.name;
+    return params_.module_name;
 }
 
 ModuleParams MonitorModule::get_params() const

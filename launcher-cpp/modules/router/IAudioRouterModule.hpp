@@ -6,10 +6,14 @@
 #define IAUDIOROUTERMODULE_HPP
 #include "../IModule.hpp"
 
+class IAudioSource;
+
 class IAudioRouterModule : public IModule
 {
 public:
      ~IAudioRouterModule() override = default;
+
+     [[nodiscard]] virtual IAudioSource* get_source() const = 0;
 };
 
 #endif //IAUDIOROUTERMODULE_HPP

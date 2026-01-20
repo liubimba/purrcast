@@ -4,7 +4,7 @@
 
 #ifndef IHEALTHCHECKER_HPP
 #define IHEALTHCHECKER_HPP
-#include "HealthStatus.hpp"
+#include "health_status.hpp"
 #include "../modules/IModule.hpp"
 
 
@@ -17,7 +17,7 @@ public:
     }
 
     virtual ~IHealthChecker() = default;
-    virtual HealthStatus checkStatus() const = 0;
+    virtual health_status check() const = 0;
 
 protected:
     const IModule* module_;

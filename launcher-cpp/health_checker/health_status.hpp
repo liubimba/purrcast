@@ -5,9 +5,9 @@
 #ifndef HEALTHSTATUS_HPP
 #define HEALTHSTATUS_HPP
 
-enum class HealthStatus
+enum class health_status
 {
-    HEALTHY, UNHEALTHY, NOT_LOADED
+    healthy, unhealthy, not_loaded
 };
 
 #endif //HEALTHSTATUS_HPP

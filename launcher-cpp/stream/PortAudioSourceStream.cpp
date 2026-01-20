@@ -26,7 +26,7 @@ PortAudioSourceStream::PortAudioSourceStream(const Services* services,
 
 {
     if (services && services->has<LoggerFactory>())
-        logger_ = services->get<LoggerFactory>()->create("PortAudioSourceStream-" + id);
+        logger_ = services->get<LoggerFactory>()->create("pa-source-stream-" + id);
 }
 
 PortAudioSourceStream::~PortAudioSourceStream()
@@ -73,7 +73,7 @@ bool PortAudioSourceStream::start(const AudioStreamParameters& parameters)
     }
     if (inputParameters.device == paNoDevice)
     {
-        logger_->info("No input devices found for {}", parameters.name);
+        logger_->error("No input devices found for {}", parameters.name);
         return false;
     }
     logger_->info("Open stream for {}, channels={}, sampleRate={}, framesPerBuffer={}", parameters.name,
@@ -128,18 +128,23 @@ bool PortAudioSourceStream::started()
     return m_pStream && Pa_IsStreamActive(m_pStream);
 }
 
-void PortAudioSourceStream::send(const AudioChunk& chunk)
+void PortAudioSourceStream::send(const audio_chunk& chunk)
 {
-    std::for_each(sinks_.begin(), sinks_.end(), [chunk](IAudioSinkStream* sink)
+    std::for_each(sinks_.begin(), sinks_.end(), [chunk](IAudioSink* sink)
     {
         sink->receive(chunk);
     });
 }
 
-int PortAudioSourceStream::callback_(const void* input, void* output, unsigned long frameCount,
+int PortAudioSourceStream::callback_(const void* input, void* output, unsigned long frames_per_buffer,
                                      const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags)
 {
     if (!sinks_.empty())
-        send(AudioChunk{.data = input, .size = frameCount * params_.channels * 2});
+        send(audio_chunk{
+            .data = input,
+            .channels = params_.channels,
+            .frames_per_buffer = frames_per_buffer,
+            .bytes_per_sample = sizeof(int16_t),
+        });
     return paContinue;
 }

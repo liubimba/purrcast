@@ -19,18 +19,12 @@ bool SnapclientModule::load(const ModuleParams& moduleParams)
     if (loaded())
         throw std::runtime_error("SnapclientModule already loaded");
     settings::s_module::s_snapclient params = std::get<settings::s_module::s_snapclient>(moduleParams);
-    if (!std::filesystem::exists(params.bin))
+    if (!std::filesystem::exists(params.path_to_binary))
         throw std::runtime_error("SnapclientModule binary file does not exists");
-    PcmDevice device = resolveAudioDeviceName_(params.sinkIndex);
-    if (device.name.empty())
-    {
-        logger_->info("Bad sink index passed: {}, not found any suitable device", params.sinkIndex);
-        return false;
-    }
-    std::string soundcard = absl::StrFormat("--soundcard %s", device.name);
+    std::string soundcard = absl::StrFormat("--soundcard %s --player pulse", params.soundcard);
     std::unique_lock lock(mutex_);
     std::unique_ptr<Process> process = std::make_unique<Process>(services_, logger_->name());
-    if (process->execute(params.bin, soundcard))
+    if (process->execute(params.path_to_binary, soundcard))
     {
         logger_->info("Successfully executed Snapclient process");
         p_snapclientProcess = std::move(process);
@@ -49,12 +43,6 @@ bool SnapclientModule::reload(const ModuleParams& moduleParams)
     if (!loaded())
         throw std::runtime_error("SnapclientModule is not loaded to request reload it");
     settings::s_module::s_snapclient params = std::get<settings::s_module::s_snapclient>(moduleParams);
-    PcmDevice device = resolveAudioDeviceName_(params.sinkIndex);
-    if (device.name.empty())
-    {
-        logger_->info("Bad sink index passed: {}, not found any suitable device", params.sinkIndex);
-        return false;
-    }
     if (params_ == params)
     {
         logger_->info("Passed same parameteres, reloading is pointless");
@@ -100,10 +88,9 @@ ModuleParams SnapclientModule::get_params() const
     return params_;
 }
 
-PcmDevice SnapclientModule::resolveAudioDeviceName_(int sinkIndex)
+PcmDevice SnapclientModule::resolveAudioDeviceName_(const std::string& sinkIndex)
 {
     PcmDevice device;
-    device.index = -1;
 #if defined(__linux__)
     void **hints, **n;
     char *name, *io;
@@ -117,7 +104,7 @@ PcmDevice SnapclientModule::resolveAudioDeviceName_(int sinkIndex)
         io = snd_device_name_get_hint(*n, "IOID");
         if ((io == nullptr || strcmp(io, "Output") == 0) && (name != nullptr && strstr(name, "DEV=") != nullptr))
         {
-            int index = atoi(strstr(name, "DEV=") + 4);
+            std::string index = strstr(name, "DEV=") + 4;
             if (index == sinkIndex)
             {
                 if (std::strstr(name, "hw") == name)

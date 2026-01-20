@@ -9,22 +9,28 @@
 
 #include "../libs/snapcast/common/json.hpp"
 
+#define MAX_ORDER 1 << 32
+#define MIN_ORDER 0
+
 struct module_description
 {
     virtual ~module_description() = default;
-    std::string name;
-    std::vector<std::string> dependsOn;
+    int order_of_loading = MAX_ORDER;
+    bool enabled = true;
+    std::string module_name;
+    std::vector<std::string> depends_on;
 
     bool operator==(const module_description& other) const
     {
-        return name == other.name && dependsOn == other.dependsOn;
+        return module_name == other.module_name && depends_on == other.depends_on;
     }
 
     nlohmann::json to_json() const
     {
         nlohmann::json j;
-        j["name"] = name;
-        j["dependsOn"] = dependsOn;
+        j["module_name"] = module_name;
+        j["depends_on"] = depends_on;
+        j["order_of_loading"] = order_of_loading;
         return j;
     }
 

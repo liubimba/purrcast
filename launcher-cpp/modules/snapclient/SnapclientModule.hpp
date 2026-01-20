@@ -20,7 +20,7 @@
 struct PcmDevice
 {
     std::string name;
-    int index = -1;
+    std::string index = "-1";
 };
 
 namespace Alsa
@@ -43,7 +43,7 @@ public:
     [[nodiscard]] ModuleParams get_params() const override;
 
 private:
-    static PcmDevice resolveAudioDeviceName_(int sinkIndex);
+    static PcmDevice resolveAudioDeviceName_(const std::string& sinkIndex);
 
     const Services* services_;
     std::mutex mutex_;

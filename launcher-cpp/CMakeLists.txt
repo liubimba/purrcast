@@ -16,7 +16,14 @@ add_compile_definitions(VERSION="${PROJECT_VERSION}")
 
 find_package(Boost 1.74 REQUIRED COMPONENTS thread chrono)
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(PULSE REQUIRED libpulse)
 pkg_check_modules(PULSEAUDIO REQUIRED libpulse)
+if (PULSE_FOUND)
+    add_definitions(-DHAS_PULSE)
+    message(STATUS "PulseAudio found: ${PULSE_VERSION}")
+else ()
+    message(WARNING "PulseAudio not found")
+endif ()
 
 if (MSVC)
     add_compile_options(/W4)
@@ -73,12 +80,12 @@ add_executable(multiroom
         settings/SettingsObservable.cpp
         modules/server/ServerModule.cpp
         modules/monitor/MonitorModule.cpp
-        modules/monitor/MonitorModule.hpp
         modules/monitor/MonitorSession.cpp
-        modules/monitor/MonitorSession.hpp
-        modules/ModuleStatus.hpp
-        modules/monitor/MonitorSessionListener.hpp
-        modules/monitor/MonitorReportMessage.hpp
+        modules/test_environment/TestEnvironmentModule.cpp
+        stream/FileAudioSinkStream.cpp
+        adapter/loopback_snapclient/LoopbackSnapclientAdapter.cpp
+        modules/test_environment/audio_inspector/FingerpintAudioInspector.cpp
+        modules/test_environment/listener/ProxyAudioSinkListener.cpp
 )
 
 set_target_properties(snapserver PROPERTIES
