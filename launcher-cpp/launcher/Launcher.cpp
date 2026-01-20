@@ -5,6 +5,7 @@
 #include "Launcher.hpp"
 
 #include "../modules/monitor/MonitorModule.hpp"
+#include "../modules/test_environment/TestEnvironmentModule.hpp"
 
 
 Launcher::Launcher()
@@ -42,26 +43,26 @@ void Launcher::launch_(const settings& settings, boost::asio::io_context& io_con
 
     manager_ = std::make_unique<ModuleManager>(&services);
 
-    AudioRouterModule routerModule(&services);
-    InternalHealthChecker routerChecker(&routerModule, &services);
-    ModuleSession routerSession;
-    routerSession.checker = &routerChecker;
-    routerSession.module = &routerModule;
-    routerSession.params = settings.module.router;
+    AudioRouterModule router_module(&services);
+    InternalHealthChecker routerChecker(&router_module, &services);
+    module_session audio_router_session;
+    audio_router_session.checker = &routerChecker;
+    audio_router_session.module = &router_module;
+    audio_router_session.params = settings.module.router;
 
     AudioLoopbackModule loopbackModule(&services);
     InternalHealthChecker loopbackChecker(&loopbackModule, &services);
-    ModuleSession loopbackSession;
-    loopbackSession.checker = &loopbackChecker;
-    loopbackSession.module = &loopbackModule;
-    loopbackSession.params = settings.module.loopback;
+    module_session audio_loopback_session;
+    audio_loopback_session.checker = &loopbackChecker;
+    audio_loopback_session.module = &loopbackModule;
+    audio_loopback_session.params = settings.module.loopback;
 
     SnapclientModule snapclientModule(&services);
     InternalHealthChecker snapclientChecker(&snapclientModule, &services);
-    ModuleSession snapclientSession;
-    snapclientSession.checker = &snapclientChecker;
-    snapclientSession.module = &snapclientModule;
-    snapclientSession.params = settings.module.snapclient;
+    module_session snapclient_session;
+    snapclient_session.checker = &snapclientChecker;
+    snapclient_session.module = &snapclientModule;
+    snapclient_session.params = settings.module.snapclient;
 
     SnapserverModule snapserverModule(&services);
     TCPHealthChecker snapserverChecker(&snapserverModule, &services, {
@@ -69,36 +70,65 @@ void Launcher::launch_(const settings& settings, boost::asio::io_context& io_con
                                            settings.module.snapserver.ports.http,
                                            settings.module.snapserver.ports.stream
                                        });
-    ModuleSession snapserverSession;
-    snapserverSession.checker = &snapserverChecker;
-    snapserverSession.module = &snapserverModule;
-    snapserverSession.params = settings.module.snapserver;
+    module_session snapserver_session;
+    snapserver_session.checker = &snapserverChecker;
+    snapserver_session.module = &snapserverModule;
+    snapserver_session.params = settings.module.snapserver;
 
     ServerModule serverModule(&services);
     TCPHealthChecker serverChecker(&serverModule, &services, {
                                        settings.module.server.port
                                    });
-    ModuleSession serverSession;
-    serverSession.checker = &serverChecker;
-    serverSession.module = &serverModule;
-    serverSession.params = settings.module.server;
+    module_session http_server_session;
+    http_server_session.checker = &serverChecker;
+    http_server_session.module = &serverModule;
+    http_server_session.params = settings.module.server;
 
 
     MonitorModule monitorServer{io_context, manager_.get(), &services};
     TCPHealthChecker monitorChecker(&monitorServer, &services, {
                                         settings.module.monitor.port
                                     });
-    ModuleSession monitorSession;
-    monitorSession.checker = &monitorChecker;
-    monitorSession.module = &monitorServer;
-    monitorSession.params = settings.module.monitor;
+    module_session ws_monitor_session;
+    ws_monitor_session.checker = &monitorChecker;
+    ws_monitor_session.module = &monitorServer;
+    ws_monitor_session.params = settings.module.monitor;
 
-    manager_->add(routerSession);
-    manager_->add(loopbackSession);
-    manager_->add(snapserverSession);
-    manager_->add(snapclientSession);
-    manager_->add(serverSession);
-    manager_->add(monitorSession);
+    manager_->add(snapserver_session);
+    manager_->add(snapclient_session);
+    manager_->add(http_server_session);
+    manager_->add(ws_monitor_session);
+    manager_->add(audio_router_session);
+    manager_->add(audio_loopback_session);
+
+    AudioLoopbackModule test_loopback_module(&services);
+    InternalHealthChecker test_loopback_checker(&test_loopback_module, &services);
+    module_session test_loopback_session;
+    test_loopback_session.checker = &test_loopback_checker;
+    test_loopback_session.module = &test_loopback_module;
+    test_loopback_session.params = settings.module.test_environment.loopback;
+
+    SnapclientModule test_snapclient_module(&services);
+    InternalHealthChecker test_snapclient_checker(&snapclientModule, &services);
+    module_session test_snapclient_session;
+    test_snapclient_session.checker = &test_snapclient_checker;
+    test_snapclient_session.module = &test_snapclient_module;
+    test_snapclient_session.params = settings.module.test_environment.snapclient;
+
+    TestEnvironmentModule test_environment_module{io_context, &services, router_module.get_source()};
+    InternalHealthChecker test_environment_checker(&test_environment_module, &services);
+    module_session test_environment_session;
+    test_environment_session.checker = &test_environment_checker;
+    test_environment_session.module = &test_environment_module;
+    test_environment_session.params = settings.module.test_environment;
+
+
+    if (settings.module.test_environment.enabled)
+    {
+        manager_->add(test_environment_session);
+        manager_->add(test_snapclient_session);
+        manager_->add(test_loopback_session);
+    }
 
     manager_->startup(settings.manager);
 

@@ -13,12 +13,11 @@ class InternalHealthChecker : public IHealthChecker
 public:
     explicit InternalHealthChecker(const IModule* module, const Services* services);
     ~InternalHealthChecker() override;
-    HealthStatus checkStatus() const override;
+    [[nodiscard]] health_status check() const override;
 
 private:
     const Services* services_;
     std::shared_ptr<spdlog::logger> logger_;
 };
-
 
 #endif //INTERNALHEALTHCHECKER_HPP

@@ -33,7 +33,7 @@ public:
     virtual bool started() = 0;
 
 
-    [[nodiscard]] virtual std::string getId() const
+    [[nodiscard]] virtual std::string get_id() const
     {
         return m_id;
     }

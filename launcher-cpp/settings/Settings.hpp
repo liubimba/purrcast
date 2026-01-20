@@ -43,7 +43,7 @@ struct settings
 
             s_monitor(): interval(0), port(0)
             {
-                name = "monitor";
+                module_name = "monitor";
             }
 
             bool operator==(const s_monitor& other) const
@@ -69,7 +69,7 @@ struct settings
 
             s_server()
             {
-                name = "server";
+                module_name = "server";
             }
 
             s_server(const s_server& oth) = default;
@@ -92,14 +92,16 @@ struct settings
 
         struct s_loopback : module_description
         {
-            std::string virtualSinkName = "VirtualSink";
-            int framesPerBuffer = 1024;
-            int sampleRate = 48000;
+            std::string loopback_sink_name = "null";
+            int frames_per_buffer = 512;
+            int sample_rate = 48000;
             int channels = 2;
+            bool set_as_default = true;
+            bool resolve_origin_alsa_device = true;
 
             s_loopback()
             {
-                name = "loopback";
+                module_name = "loopback";
             }
 
             s_loopback(const s_loopback& oth) = default;
@@ -107,19 +109,20 @@ struct settings
 
             bool operator==(const s_loopback& oth) const
             {
-                return virtualSinkName == oth.virtualSinkName && name == oth.name &&
-                    dependsOn == oth.dependsOn && framesPerBuffer == oth.framesPerBuffer && sampleRate == oth.sampleRate
+                return loopback_sink_name == oth.loopback_sink_name && module_name == oth.module_name &&
+                    depends_on == oth.depends_on && frames_per_buffer == oth.frames_per_buffer && sample_rate == oth.
+                    sample_rate
                     && channels == oth.channels;
             }
 
             std::string to_string() const override
             {
                 nlohmann::json j = module_description::to_json();
-                j["virtualSink"] = virtualSinkName;
-                j["name"] = name;
-                j["dependsOn"] = dependsOn;
-                j["framesPerBuffer"] = framesPerBuffer;
-                j["sampleRate"] = sampleRate;
+                j["virtualSink"] = loopback_sink_name;
+                j["name"] = module_name;
+                j["dependsOn"] = depends_on;
+                j["framesPerBuffer"] = frames_per_buffer;
+                j["sampleRate"] = sample_rate;
                 j["channels"] = channels;
                 return j.dump();
             }
@@ -130,7 +133,7 @@ struct settings
             struct s_source
             {
                 std::string name;
-                int framesPerBuffer = 1024;
+                int framesPerBuffer = 512;
                 int sampleRate = 48000;
                 int channels = 2;
 
@@ -154,7 +157,7 @@ struct settings
             struct s_sink
             {
                 std::string name = "/tmp/snapfifo";
-                int framesPerBuffer = 1024;
+                int framesPerBuffer = 512;
                 int sampleRate = 48000;
                 int channels = 2;
 
@@ -175,14 +178,16 @@ struct settings
                 }
             };
 
+            bool record_source = true;
+
             s_router(): s_router({}, {})
             {
             }
 
             s_router(s_source source, s_sink sink): source(std::move(source)), sink(std::move(sink))
             {
-                name = "router";
-                dependsOn.assign({"loopback"});
+                module_name = "router";
+                depends_on.assign({"loopback"});
             }
 
             s_router(const s_router& oth) = default;
@@ -193,7 +198,7 @@ struct settings
 
             bool operator==(const s_router& oth) const
             {
-                return dependsOn == oth.dependsOn && source == oth.source && sink == oth.sink;
+                return depends_on == oth.depends_on && source == oth.source && sink == oth.sink;
             }
 
             std::string to_string() const override
@@ -228,14 +233,14 @@ struct settings
                 }
             };
 
-            std::string bin;
+            std::string path_to_binary;
             std::string config;
             s_ports ports{};
 
             s_snapserver()
             {
-                name = "snapserver";
-                dependsOn = {"router"};
+                module_name = "snapserver";
+                depends_on = {"router"};
             }
 
             s_snapserver(const s_snapserver& oth) = default;
@@ -243,14 +248,14 @@ struct settings
 
             bool operator==(const s_snapserver& oth) const
             {
-                return dependsOn == oth.dependsOn && bin == oth.bin && config == oth.config &&
+                return depends_on == oth.depends_on && path_to_binary == oth.path_to_binary && config == oth.config &&
                     ports == oth.ports;
             }
 
             std::string to_string() const override
             {
                 nlohmann::json j = module_description::to_json();
-                j["bin"] = bin;
+                j["bin"] = path_to_binary;
                 j["config"] = config;
                 j["ports"] = ports.to_json();
                 return j.dump();
@@ -259,14 +264,13 @@ struct settings
 
         struct s_snapclient : module_description
         {
-            std::vector<std::string> dependsOn = {"snapserver"};
-            std::string bin;
-            int sinkIndex = -1;
+            std::string path_to_binary;
+            std::string soundcard;
 
             s_snapclient()
             {
-                name = "snapclient";
-                dependsOn.assign({"snapserver", "loopback"});
+                module_name = "snapclient";
+                depends_on.assign({"snapserver", "loopback"});
             }
 
             s_snapclient(const s_snapclient& oth) = default;
@@ -274,19 +278,45 @@ struct settings
 
             bool operator==(const s_snapclient& oth) const
             {
-                return dependsOn == oth.dependsOn && name == oth.name &&
-                    bin == oth.bin && sinkIndex == oth.sinkIndex;
+                return depends_on == oth.depends_on && module_name == oth.module_name &&
+                    path_to_binary == oth.path_to_binary && soundcard == oth.soundcard;
             }
 
-            std::string to_string() const override
+            [[nodiscard]] std::string to_string() const override
             {
                 nlohmann::json j = module_description::to_json();
-                j["dependsOn"] = dependsOn;
-                j["bin"] = bin;
-                j["sinkIndex"] = sinkIndex;
+                j["path_to_binary"] = path_to_binary;
+                j["soundcard"] = soundcard;
                 return j.dump();
             }
         };
+
+        struct s_test_environment : module_description
+        {
+            s_loopback loopback;
+            s_snapclient snapclient;
+            std::string loopback_name;
+            std::string loopback_monitor_description;
+
+            s_test_environment()
+            {
+                module_name = "test_environment";
+                depends_on = {"router"};
+            }
+
+            bool operator==(const s_test_environment& oth) const
+            {
+                return oth.loopback == loopback && oth.snapclient == snapclient;
+            }
+
+            [[nodiscard]] std::string to_string() const override
+            {
+                nlohmann::json j = to_json();
+                j["name"] = module_name;
+                return j.dump();
+            }
+        };
+
 
         s_server server;
         s_router router;
@@ -294,6 +324,7 @@ struct settings
         s_snapserver snapserver;
         s_snapclient snapclient;
         s_monitor monitor;
+        s_test_environment test_environment;
     };
 
     s_log log;
@@ -307,7 +338,8 @@ using ModuleParams = std::variant<
     settings::s_module::s_snapserver,
     settings::s_module::s_snapclient,
     settings::s_module::s_server,
-    settings::s_module::s_monitor
+    settings::s_module::s_monitor,
+    settings::s_module::s_test_environment
 >;
 
 inline const module_description& module_cast(const ModuleParams& params)

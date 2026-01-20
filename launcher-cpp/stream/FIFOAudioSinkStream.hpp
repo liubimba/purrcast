@@ -6,7 +6,9 @@
 #define FIFOAUDIOSINKSTREAM_HPP
 #include <fstream>
 #include <mutex>
+#include "IAudioSink.hpp"
 #include "IAudioSinkStream.hpp"
+#include "IAudioStream.hpp"
 #include "../logger/LoggerFactory.hpp"
 
 
@@ -18,7 +20,7 @@ public:
     bool start(const AudioStreamParameters& parameters) override;
     bool stop() override;
     bool started() override;
-    void receive(const AudioChunk& chunk) override;
+    void receive(const audio_chunk& chunk) override;
 
 private:
     std::mutex mutex_;

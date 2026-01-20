@@ -5,11 +5,11 @@
 #include "AudioLoopbackModule.hpp"
 
 
-AudioLoopbackModule::AudioLoopbackModule(const Services* services):
+AudioLoopbackModule::AudioLoopbackModule(const Services* services, const std::string& id):
     services_(services)
 {
 #if defined(__linux__)
-    internalModule_ = std::make_unique<pulse::AudioLoopbackModule>(services);
+    internal_ = std::make_unique<pulse::AudioLoopbackModule>(services, id.empty() ? "pulse" : id);
 #else
 #error unsupported platform for AudioLoopbackModule
 #endif
@@ -21,40 +21,65 @@ AudioLoopbackModule::~AudioLoopbackModule()
 
 bool AudioLoopbackModule::load(const ModuleParams& params)
 {
-    return internalModule_->load(params);
+    return internal_->load(params);
 }
 
 bool AudioLoopbackModule::reload(const ModuleParams& params)
 {
-    return internalModule_->reload(params);
+    return internal_->reload(params);
 }
 
 bool AudioLoopbackModule::unload()
 {
-    return internalModule_->unload();
+    return internal_->unload();
 }
 
 bool AudioLoopbackModule::loaded() const
 {
-    return internalModule_->loaded();
+    return internal_->loaded();
 }
 
 std::string AudioLoopbackModule::name() const
 {
-    return internalModule_->name();
+    return internal_->name();
 }
 
 ModuleParams AudioLoopbackModule::get_params() const
 {
-    return internalModule_->get_params();
+    return internal_->get_params();
 }
 
-uint32_t AudioLoopbackModule::getSinkIndex()
+std::string AudioLoopbackModule::get_origin_alsa_device()
 {
-    return internalModule_->getSinkIndex();
+    return internal_->get_origin_alsa_device();
 }
 
-std::string AudioLoopbackModule::getMonitorDescription()
+std::string AudioLoopbackModule::get_loopback_monitor_description()
 {
-    return internalModule_->getMonitorDescription();
+    return internal_->get_loopback_monitor_description();
+}
+
+std::string AudioLoopbackModule::get_loopback_alsa_device()
+{
+    return internal_->get_loopback_alsa_device();
+}
+
+std::string AudioLoopbackModule::get_loopback_description()
+{
+    return internal_->get_loopback_description();
+}
+
+audio_device AudioLoopbackModule::get_origin_device()
+{
+    return internal_->get_origin_device();
+}
+
+audio_device AudioLoopbackModule::get_loopback_device()
+{
+    return internal_->get_loopback_device();
+}
+
+audio_device AudioLoopbackModule::get_loopback_monitor_device()
+{
+    return internal_->get_loopback_monitor_device();
 }

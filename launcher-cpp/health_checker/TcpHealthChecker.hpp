@@ -16,7 +16,7 @@ class TCPHealthChecker : public InternalHealthChecker
 public:
     explicit TCPHealthChecker(const IModule* module, const Services* services, std::initializer_list<int> ports);
     ~TCPHealthChecker() override;
-    HealthStatus checkStatus() const override;
+    health_status check() const override;
 
 private:
     const Services* services_;

@@ -12,7 +12,7 @@
 class IModule
 {
 protected:
-    ModuleStatus status_ = {};
+    ModuleStatus last_status_ = {};
 
 public:
     virtual ~IModule() = default;
@@ -25,7 +25,7 @@ public:
 
     [[nodiscard]] virtual ModuleStatus get_last_status() const
     {
-        return status_;
+        return last_status_;
     }
 };
 

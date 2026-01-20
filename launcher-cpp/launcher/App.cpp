@@ -36,6 +36,13 @@ int main(int argc, char** argv)
       parser.add_argument("--monitor.interval")
             .help("Interval between monitoring in milliseconds")
             .default_value("1000");
+      parser.add_argument("--test.snapclient.path")
+            .help("Path to test snapclient binary file")
+            .default_value("--snapclient.path");
+      parser.add_argument("--test.enabled")
+            .choices("false", "true")
+            .help("Enable testing environment")
+            .default_value("false");
 
       try
       {
@@ -43,18 +50,38 @@ int main(int argc, char** argv)
 
             settings settings;
 
+            settings.module.loopback.order_of_loading = MIN_ORDER;
+
             settings.module.server.bin = parser.get<std::string>("--server.path");
             settings.module.server.port = std::atoi(parser.get<std::string>("--server.port").c_str());
             settings.module.server.static_dir = parser.get<std::string>("--server.static_dir");
 
-            settings.module.snapclient.bin = parser.get<std::string>("--snapclient.path");
+            settings.module.snapclient.path_to_binary = parser.get<std::string>("--snapclient.path");
 
-            settings.module.snapserver.bin = parser.get<std::string>("--snapserver.path");
+            settings.module.snapserver.path_to_binary = parser.get<std::string>("--snapserver.path");
             settings.module.snapserver.config = parser.get<std::string>("--snapserver.config");
 
             settings.module.monitor.interval = std::atoi(parser.get<std::string>("--monitor.interval").c_str());
             settings.module.monitor.address = parser.get<std::string>("--monitor.address");
             settings.module.monitor.port = std::atoi(parser.get<std::string>("--monitor.port").c_str());
+
+            settings.module.test_environment.enabled = parser.get<std::string>("--test.enabled") == "true";
+            settings.module.test_environment.loopback.module_name = "test_environment_loopback";
+            settings.module.test_environment.loopback.set_as_default = false;
+            settings.module.test_environment.loopback.resolve_origin_alsa_device = false;
+            settings.module.test_environment.loopback.loopback_sink_name = "test-null";
+            settings.module.test_environment.loopback.order_of_loading = MIN_ORDER;
+
+            settings.module.test_environment.snapclient.module_name = "test_environment_snapclient";
+            if (parser.get<std::string>("--test.snapclient.path") == "--snapclient.path")
+            {
+                  settings.module.test_environment.snapclient.path_to_binary = settings.module.snapclient.
+                        path_to_binary;
+            }
+            else
+            {
+                  settings.module.snapclient.path_to_binary = parser.get<std::string>("--test.snapclient.path");
+            }
 
             Launcher launcher;
             launcher.launch(settings);

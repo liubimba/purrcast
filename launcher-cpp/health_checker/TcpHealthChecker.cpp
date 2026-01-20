@@ -17,19 +17,19 @@ TCPHealthChecker::~TCPHealthChecker()
     services_->get<LoggerFactory>()->drop(logger_);
 }
 
-HealthStatus TCPHealthChecker::checkStatus() const
+health_status TCPHealthChecker::check() const
 {
-    HealthStatus status = InternalHealthChecker::checkStatus();
-    if (status == HealthStatus::HEALTHY)
+    health_status status = InternalHealthChecker::check();
+    if (status == health_status::healthy)
     {
-        for (auto it = ports_.begin(); it != ports_.end() && status == HealthStatus::HEALTHY; ++it)
+        for (auto it = ports_.begin(); it != ports_.end() && status == health_status::healthy; ++it)
         {
             int port = *it;
             logger_->info("Check port {}", port);
             if (!Port::isBound(port))
             {
                 logger_->error("Expected that port {} is bound, but its free", port);
-                status = HealthStatus::UNHEALTHY;
+                status = health_status::unhealthy;
             }
         }
     }
