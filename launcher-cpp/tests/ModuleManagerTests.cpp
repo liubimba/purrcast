@@ -6,7 +6,7 @@
 
 TEST(ModuleManager, startup)
 {
-    ModuleParams params = settings::s_module::loopback();
+    module_params params = settings::s_module::loopback();
 
     auto d = module_cast(params);
     std::cout << d.module_name << std::endl;

@@ -6,7 +6,7 @@
 
 TEST(PulseMainloopService, issue)
 {
-    pulse::MainloopService service{TestData::services()};
+    pulse::mainloop_service service{TestData::services()};
     ASSERT_TRUE(service.available());
     pa_context* ctx = service.issue(TestData::uuid().c_str());
     ASSERT_NE(nullptr, ctx);

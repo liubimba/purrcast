@@ -7,8 +7,8 @@
 
 TEST(Port, isBound)
 {
-    ASSERT_FALSE(!Port::isBound(1704));
-    ASSERT_FALSE(!Port::isBound(1704));
+    ASSERT_FALSE(!os_port::is_bound(1704));
+    ASSERT_FALSE(!os_port::is_bound(1704));
 #if defined(__linux)
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_NE(sockfd, -1);
@@ -20,7 +20,7 @@ TEST(Port, isBound)
     {
         FAIL() << "bind failed";
     }
-    ASSERT_TRUE(Port::isBound(1704));
+    ASSERT_TRUE(os_port::is_bound(1704));
     close(sockfd);
 #endif
 }

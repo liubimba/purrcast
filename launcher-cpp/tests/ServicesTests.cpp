@@ -4,7 +4,7 @@
 
 #include "Tests.hpp"
 
-class Service : public IService
+class Service : public i_service
 {
 public:
     Service() = default;
@@ -18,7 +18,7 @@ public:
 
 TEST(Services, add)
 {
-    Services services;
+    services services;
     auto service = std::make_shared<Service>();
     ASSERT_ANY_THROW(services.add<Service>(nullptr));
     services.add<Service>(service);
@@ -27,7 +27,7 @@ TEST(Services, add)
 
 TEST(Services, get)
 {
-    Services services;
+    services services;
     auto service = std::make_shared<Service>();
     services.add<Service>(service);
     ASSERT_EQ(service, services.get<Service>());
@@ -35,7 +35,7 @@ TEST(Services, get)
 
 TEST(Services, has)
 {
-    Services services;
+    services services;
     auto service = std::make_shared<Service>();
     services.add<Service>(service);
     ASSERT_TRUE(services.has<Service>());

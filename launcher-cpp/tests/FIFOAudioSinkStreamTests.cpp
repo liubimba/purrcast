@@ -6,8 +6,8 @@
 
 TEST(FIFOAudioSinkStream, start)
 {
-    AudioStreamParameters parameters;
-    FIFOAudioSinkStream stream{TestData::services(), TestData::uuid()};
+    audio_stream_params parameters;
+    fifo_audio_sink_stream stream{TestData::services(), TestData::uuid()};
     ASSERT_FALSE(stream.start(parameters));
     parameters.name = "/tmp/fifo";
     ASSERT_TRUE(stream.start(parameters));
@@ -15,8 +15,8 @@ TEST(FIFOAudioSinkStream, start)
 
 TEST(FIFOAudioSinkStream, stop)
 {
-    AudioStreamParameters parameters;
-    FIFOAudioSinkStream stream{TestData::services(), TestData::uuid()};
+    audio_stream_params parameters;
+    fifo_audio_sink_stream stream{TestData::services(), TestData::uuid()};
     ASSERT_ANY_THROW(stream.stop());
     parameters.name = "/tmp/fifo";
     ASSERT_TRUE(stream.start(parameters));
@@ -25,8 +25,8 @@ TEST(FIFOAudioSinkStream, stop)
 
 TEST(FIFOAudioSinkStream, started)
 {
-    AudioStreamParameters parameters;
-    FIFOAudioSinkStream stream{TestData::services(), TestData::uuid()};
+    audio_stream_params parameters;
+    fifo_audio_sink_stream stream{TestData::services(), TestData::uuid()};
     ASSERT_FALSE(stream.started());
     parameters.name = "/tmp/fifo";
     ASSERT_TRUE(stream.start(parameters));

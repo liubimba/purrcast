@@ -7,7 +7,7 @@
 #include <mutex>
 #include <unordered_set>
 
-#include "IAudioSink.hpp"
+#include "i_audio_sink.hpp"
 
 class IAudioSource
 {
@@ -16,13 +16,13 @@ public:
 
      virtual void send(const audio_chunk& chunk) = 0;
 
-     virtual void add_sink(IAudioSink* sink)
+     virtual void add_sink(i_audio_sink* sink)
      {
           std::unique_lock lock(mutex_);
           sinks_.insert(sink);
      }
 
-     virtual void remove_sink(IAudioSink* sink)
+     virtual void remove_sink(i_audio_sink* sink)
      {
           std::unique_lock lock(mutex_);
           if (sinks_.count(sink) > 0) sinks_.erase(sink);
@@ -30,7 +30,7 @@ public:
 
 protected:
      std::mutex mutex_;
-     std::unordered_set<IAudioSink*> sinks_;
+     std::unordered_set<i_audio_sink*> sinks_;
 };
 
 #endif //IAUDIOSOURCESTREAM_HPP
