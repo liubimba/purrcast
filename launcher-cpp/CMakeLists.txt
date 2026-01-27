@@ -55,37 +55,34 @@ option(ENABLE_DEBUG_FLAGS "Enable debug flags and optimizations" OFF)
 option(BUILD_TESTS "Build and run tests" OFF)
 
 add_executable(multiroom
-        launcher/Launcher.cpp
-        launcher/App.cpp
+        launcher/launcher.cpp
+        launcher/app.cpp
 
-        settings/Settings.cpp
-        settings/SettingsReader.cpp
-        logger/LoggerFactory.cpp
-        modules/snapserver/SnapserverModule.cpp
-        modules/manager/ModuleManager.cpp
-        util/Port.cpp
-        util/Process.cpp
-        util/LinuxProcess.cpp
-        util/Executor.cpp
-        modules/snapclient/SnapclientModule.cpp
-        util/ProcessInfo.cpp
-        modules/loopback/AudioLoopbackModule.cpp
-        modules/loopback/PulseAudioLoopbackModule.cpp
-        services/PulseMainloopService.cpp
-        stream/PortAudioSourceStream.cpp
-        stream/FIFOAudioSinkStream.cpp
-        health_checker/InternalHealthChecker.cpp
-        health_checker/TcpHealthChecker.cpp
-        modules/router/AudioRouterModule.cpp
-        settings/SettingsObservable.cpp
-        modules/server/ServerModule.cpp
-        modules/monitor/MonitorModule.cpp
-        modules/monitor/MonitorSession.cpp
-        modules/test_environment/TestEnvironmentModule.cpp
-        stream/FileAudioSinkStream.cpp
-        adapter/loopback_snapclient/LoopbackSnapclientAdapter.cpp
-        modules/test_environment/audio_inspector/FingerpintAudioInspector.cpp
-        modules/test_environment/listener/ProxyAudioSinkListener.cpp
+        logger/logger_factory.cpp
+        modules/snapserver/snapserver_module.cpp
+        modules/manager/module_manager.cpp
+        util/os_port.cpp
+        util/os_process.cpp
+        util/linux_process.cpp
+        util/task_executor.cpp
+        modules/snapclient/snapclient_module.cpp
+        util/process_info.cpp
+        modules/loopback/audio_loopback_module.cpp
+        modules/loopback/pulse_audio_loopback_module.cpp
+        services/pulse_audio_mainloop_service.cpp
+        stream/port_audio_source_stream.cpp
+        stream/fifo_audio_sink_stream.cpp
+        health_checker/internal_health_checker.cpp
+        health_checker/tcp_health_checker.cpp
+        modules/router/audio_router_module.cpp
+        modules/server/server_module.cpp
+        modules/monitor/monitor_module.cpp
+        modules/monitor/monitor_session.cpp
+        modules/test_environment/test_environment.cpp
+        stream/file_audio_sink_stream.cpp
+        modules/test_environment/audio_inspector/fingerprint_audio_inspector.cpp
+        modules/test_environment/listener/proxy_audio_sink_listener.cpp
+        stream/audio_stream_result.hpp
 )
 
 set_target_properties(snapserver PROPERTIES
@@ -183,26 +180,25 @@ if (RUN_TESTS)
             tests/PulseMainloopServiceTests.cpp
             tests/ServerModuleTests.cpp
 
-            util/Port.cpp
-            util/LinuxProcess.cpp
-            util/Process.cpp
-            util/ProcessInfo.cpp
-            util/Executor.cpp
-            launcher/Launcher.cpp
-            settings/Settings.cpp
-            logger/LoggerFactory.cpp
-            modules/manager/ModuleManager.cpp
-            modules/snapclient/SnapclientModule.cpp
-            modules/snapserver/SnapserverModule.cpp
-            services/PulseMainloopService.cpp
-            modules/loopback/AudioLoopbackModule.cpp
-            modules/router/AudioRouterModule.cpp
-            modules/loopback/PulseAudioLoopbackModule.cpp
-            modules/server/ServerModule.cpp
-            stream/PortAudioSourceStream.cpp
-            stream/FIFOAudioSinkStream.cpp
-            health_checker/TcpHealthChecker.cpp
-            health_checker/InternalHealthChecker.cpp
+            util/os_port.cpp
+            util/linux_process.cpp
+            util/os_process.cpp
+            util/process_info.cpp
+            util/task_executor.cpp
+            launcher/launcher.cpp
+            logger/logger_factory.cpp
+            modules/manager/module_manager.cpp
+            modules/snapclient/snapclient_module.cpp
+            modules/snapserver/snapserver_module.cpp
+            services/pulse_audio_mainloop_service.cpp
+            modules/loopback/audio_loopback_module.cpp
+            modules/router/audio_router_module.cpp
+            modules/loopback/pulse_audio_loopback_module.cpp
+            modules/server/server_module.cpp
+            stream/port_audio_source_stream.cpp
+            stream/fifo_audio_sink_stream.cpp
+            health_checker/tcp_health_checker.cpp
+            health_checker/internal_health_checker.cpp
     )
 
     target_link_libraries(multiroom_tests PUBLIC

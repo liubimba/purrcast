@@ -4,17 +4,17 @@
 
 #include "Tests.hpp"
 
-class Module : public IModule
+class Module : public i_module
 {
 public:
     bool m_loaded = false;
 
-    bool load(const ModuleParams& params) override
+    bool load(const module_params& params) override
     {
         return true;
     }
 
-    bool reload(const ModuleParams& params) override
+    bool reload(const module_params& params) override
     {
         return true;
     }
@@ -34,7 +34,7 @@ public:
         return TestData::uuid();
     }
 
-    ModuleParams get_params() const override
+    module_params get_params() const override
     {
         return {};
     }
@@ -44,7 +44,7 @@ TEST(InternalHealthChecker, status)
 {
     Module module;
     module.m_loaded = true;
-    InternalHealthChecker checker(&module, TestData::services());
+    internal_health_checker checker(&module, TestData::services());
     ASSERT_EQ(checker.check(), health_status::healthy);
     module.m_loaded = false;
     ASSERT_EQ(checker.check(), health_status::unhealthy);

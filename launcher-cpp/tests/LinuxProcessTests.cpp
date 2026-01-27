@@ -7,40 +7,40 @@
 #if defined(__linux__)
 
 #include "Tests.hpp"
-#include "../util/LinuxProcess.hpp"
+#include "../util/linux_process.hpp"
 TEST(LinuxProcess, ExecuteAndFinish)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     ASSERT_TRUE(proc.execute("/bin/sh", "-c \"sleep 0.1\""));
-    ASSERT_EQ(proc.state(), ProcessState::RUNNING);
+    ASSERT_EQ(proc.state(), process_state::RUNNING);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(150));
-    ASSERT_EQ(proc.state(), ProcessState::TERMINATED);
+    ASSERT_EQ(proc.state(), process_state::TERMINATED);
 }
 
 TEST(LinuxProcess, TerminateStopsProcess)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     ASSERT_TRUE(proc.execute("/bin/sh", "-c \"sleep 2\""));
 
-    ASSERT_EQ(proc.state(), ProcessState::RUNNING);
+    ASSERT_EQ(proc.state(), process_state::RUNNING);
     ASSERT_TRUE(proc.terminate());
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ASSERT_EQ(proc.state(), ProcessState::TERMINATED);
+    ASSERT_EQ(proc.state(), process_state::TERMINATED);
 }
 
 TEST(LinuxProcess, ExecuteTwiceFails)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     ASSERT_TRUE(proc.execute("/bin/sh", "-c \"sleep 0.2\""));
     ASSERT_ANY_THROW(proc.execute("/bin/echo", "\"hi\""));
-    ASSERT_EQ(proc.state(), ProcessState::RUNNING);
+    ASSERT_EQ(proc.state(), process_state::RUNNING);
 }
 
 TEST(LinuxProcess, ThreadSafetyRunning)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     ASSERT_TRUE(proc.execute("/bin/sh", "-c \"sleep 0.3\""));
 
     std::atomic<bool> go{true};
@@ -62,12 +62,12 @@ TEST(LinuxProcess, ThreadSafetyRunning)
     go = false;
 
     for (auto& t : threads) t.join();
-    ASSERT_EQ(proc.state(), ProcessState::TERMINATED);
+    ASSERT_EQ(proc.state(), process_state::TERMINATED);
 }
 
 TEST(LinuxProcess, ManyTerminateCallsNoDeadlock)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     ASSERT_TRUE(proc.execute("/bin/sh", "-c \"sleep 1\""));
 
     std::vector<std::thread> threads;
@@ -89,13 +89,13 @@ TEST(LinuxProcess, ManyTerminateCallsNoDeadlock)
     }
 
     for (auto& t : threads) t.join();
-    ASSERT_EQ(proc.state(), ProcessState::TERMINATED);
+    ASSERT_EQ(proc.state(), process_state::TERMINATED);
 }
 
 TEST(LinuxProcess, DestructorDoesNotDeadlock)
 {
     {
-        LinuxProcess proc{TestData::services(), TestData::uuid()};
+        linux_process proc{TestData::services(), TestData::uuid()};
         proc.execute("/bin/sh", "-c \"sleep 0.1\"");
     }
 
@@ -103,7 +103,7 @@ TEST(LinuxProcess, DestructorDoesNotDeadlock)
     SUCCEED();
 }
 
-struct DummyListener : IProcessListener
+struct DummyListener : i_process_listener
 {
     void onTerminate() override
     {
@@ -112,7 +112,7 @@ struct DummyListener : IProcessListener
 
 TEST(LinuxProcess, AddListenerIsThreadSafe)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     DummyListener listener;
 
     std::vector<std::thread> threads;
@@ -122,7 +122,7 @@ TEST(LinuxProcess, AddListenerIsThreadSafe)
         threads.emplace_back([&]()
         {
             for (int j = 0; j < 100; j++)
-                proc.addListener(&listener);
+                proc.add_listener(&listener);
         });
     }
 
@@ -132,12 +132,12 @@ TEST(LinuxProcess, AddListenerIsThreadSafe)
 
 TEST(LinuxProcess, MonitorDetectsExit)
 {
-    LinuxProcess proc{TestData::services(), TestData::uuid()};
+    linux_process proc{TestData::services(), TestData::uuid()};
     ASSERT_TRUE(proc.execute("/bin/sh", "-c \"echo hi\""));
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-    ASSERT_EQ(proc.state(), ProcessState::TERMINATED);
+    ASSERT_EQ(proc.state(), process_state::TERMINATED);
 }
 
 #endif

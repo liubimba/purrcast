@@ -6,7 +6,7 @@
 
 TEST(LoggerFactory, create)
 {
-    LoggerFactory factory;
+    logger_factory factory;
     auto logger = factory.create("test");
     ASSERT_NE(logger, nullptr);
     ASSERT_NE(logger.get(), nullptr);
@@ -14,7 +14,7 @@ TEST(LoggerFactory, create)
 
 TEST(LoggerFactory, level)
 {
-    LoggerFactory factory;
+    logger_factory factory;
     spdlog::level::level_enum level = spdlog::level::trace;
     factory.setLevel(level);
     ASSERT_EQ(level, factory.getLevel());
@@ -25,7 +25,7 @@ TEST(LoggerFactory, level)
 TEST(LoggerFactory, sink)
 {
     auto sink = std::make_shared<spdlog::sinks::daily_file_sink_st>("log.txt", 0, 0);
-    LoggerFactory factory;
+    logger_factory factory;
     factory.setSink(sink);
     ASSERT_EQ(sink, factory.getSink());
     auto logger = factory.create("test");

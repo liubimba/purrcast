@@ -11,26 +11,26 @@
 #include <gtest/gtest.h>
 #include "absl/strings/match.h"
 #include "../path/Path.hpp"
-#include "../services/Services.hpp"
-#include "../logger/LoggerFactory.hpp"
-#include "../util/LinuxProcess.hpp"
-#include "../modules/snapserver/SnapserverModule.hpp"
-#include "../modules/snapclient/SnapclientModule.hpp"
-#include "../modules/loopback/AudioLoopbackModule.hpp"
+#include "../services/services.hpp"
+#include "../logger/logger_factory.hpp"
+#include "../util/linux_process.hpp"
+#include "../modules/snapserver/snapserver_module.hpp"
+#include "../modules/snapclient/snapclient_module.hpp"
+#include "../modules/loopback/audio_loopback_module.hpp"
 
 #if defined(__linux__)
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include "../services/PulseMainloopService.hpp"
+#include "../services/pulse_audio_mainloop_service.hpp"
 #endif
-#include "../stream/PortAudioSourceStream.hpp"
-#include "../stream/FIFOAudioSinkStream.hpp"
+#include "../stream/port_audio_source_stream.hpp"
+#include "../stream/fifo_audio_sink_stream.hpp"
 #include <random>
-#include "../health_checker/InternalHealthChecker.hpp"
-#include "../health_checker/TcpHealthChecker.hpp"
-#include "../util/Port.hpp"
-#include "../modules/manager/ModuleManager.hpp"
-#include "../modules/server/ServerModule.hpp"
+#include "../health_checker/internal_health_checker.hpp"
+#include "../health_checker/tcp_health_checker.hpp"
+#include "../util/os_port.hpp"
+#include "../modules/manager/module_manager.hpp"
+#include "../modules/server/server_module.hpp"
 
 class TestData
 {
@@ -40,18 +40,18 @@ class TestData
         if (data == nullptr)
         {
             data = new TestData();
-            data->services_.add(std::make_shared<LoggerFactory>());
+            data->services_.add(std::make_shared<logger_factory>());
 #if defined(__linux__)
-            data->services_.add(std::make_shared<pulse::MainloopService>(&data->services_));
+            data->services_.add(std::make_shared<pulse::mainloop_service>(&data->services_));
 #endif
         }
         return *data;
     }
 
-    Services services_;
+    services services_;
 
 public:
-    static const Services* services()
+    static const services* services()
     {
         return &instance().services_;
     };
