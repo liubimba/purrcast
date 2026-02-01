@@ -1,19 +1,12 @@
 import {Snapcast, SnapControl} from "../snapcontrol.ts";
 import {SnapStream} from "../snapstream.ts";
-import {Logger} from "../logger/Logger.ts";
-import {LoggerFactory} from "../logger/LoggerFactory.ts";
+import {Logger} from "../shared/logger/logger.ts";
+import {LoggerFactory} from "../shared/logger/loggerFactory.ts";
 import {EventEmitter} from "events";
 import snapcast from "../assets/snapcast-512.png";
 import silence from "../assets/10-seconds-of-silence.mp3";
+import {ConnectionStatus} from "../shared/client/entity/status.ts";
 
-export const ConnectionStatus = {
-    CONNECTING: "CONNECTING",
-    CONNECTED: "CONNECTED",
-    DISCONNECTED: "DISCONNECTED",
-    FAILED: "FAILED"
-} as const;
-
-export type ConnectionStatus = typeof ConnectionStatus[keyof typeof ConnectionStatus];
 
 interface ISnapcastServiceEvents {
     connectionStatus: (status: ConnectionStatus) => void;

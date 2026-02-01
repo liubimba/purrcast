@@ -9,10 +9,10 @@ import {
 import {masterPlayerSlice} from "./masterPlayerSlice.ts";
 import {ControlService} from "../services/ControlService.ts";
 import {SnapStream} from "../snapstream.ts";
-import {ConnectionStatus} from "../services/SnapcastService.ts";
 import AsyncLock from "async-lock"
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
+import {ConnectionStatus} from "../shared/client/entity/status.ts";
 
 const name = "control"
 
@@ -72,7 +72,6 @@ export const createControlMiddleware = (): Middleware => {
         return (next) => (action) => {
             if (controlSlice.actions.connect.match(action)) {
                 lock.acquire(controlSlice.actions.connect.type, async () => {
-                    service.disconnectSafe();
                     const url = action.payload;
                     if (!URL.canParse(url)) {
                         return;
@@ -80,9 +79,7 @@ export const createControlMiddleware = (): Middleware => {
                     if (!url.startsWith("ws") && !url.startsWith("wss")) {
                         return;
                     }
-                    if (service.connected || service.connecting) {
-                        service.disconnectSafe();
-                    }
+                    service.disconnect();
                     service.connect(url);
                 });
             }
@@ -91,7 +88,7 @@ export const createControlMiddleware = (): Middleware => {
                 masterPlayerSlice.actions.setMasterMuted.match(action) ||
                 masterPlayerSlice.actions.setMasterState.match(action)) {
                 const result = next(action);
-                if (service.connected && !action.payload.remote) {
+                if (service.connected() && !action.payload.remote) {
                     service.notifyMasterPlayerChanged(store.getState().masterPlayer.volume, store.getState().masterPlayer.muted)
                 }
                 return result;

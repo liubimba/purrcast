@@ -1,0 +1,29 @@
+.app-layout {
+    padding: 16px;
+    height: 100dvh !important;
+    display: grid;
+    grid-gap: 40px;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 1fr auto;
+    overflow: hidden;
+}
+
+.app-sidebar {
+    grid-row: 1 / -1;
+    grid-column: 1;
+    overflow-y: auto;
+}
+
+.app-content {
+    grid-column: 2;
+    grid-row: 1;
+    overflow: auto;
+    min-height: 0;
+}
+
+.app-playerbar {
+    grid-column: 2;
+    grid-row: 2;
+    position: sticky;
+    bottom: 0;
+}

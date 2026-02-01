@@ -74,7 +74,7 @@ public:
         nlohmann::json json;
         json["state"] = state_;
         json["message"] = message_;
-        json["timestamp_"] = timestamp_;
+        json["timestamp"] = timestamp_;
         return json;
     }
 

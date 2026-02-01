@@ -16,8 +16,8 @@ export const MasterPlayerBar: React.FC<PlayerBarProps> = () => {
     }
 
     return (
-        <section style={{gridArea: "playerbar"}}>
-            <div className="border-2 h-full flex flex-col">
+        <div className={"w-full h-full"}>
+            <div className=" h-full flex flex-col">
                 <div className="w-full flex justify-center flex-1">
                     <button onClick={onMutedToggle}>
                         {masterMuted ? "Stop" : "Pause"}
@@ -30,7 +30,6 @@ export const MasterPlayerBar: React.FC<PlayerBarProps> = () => {
                            type="range" min={0} max={100} className="w-full flex-auto my-5"/>
                 </div>
             </div>
-        </section>
-
+        </div>
     )
 }

@@ -2,8 +2,8 @@ import Flac from 'libflacjs/dist/libflac.js'
 import type {IAudioBuffer, IAudioBufferSourceNode, IAudioContext, IGainNode} from 'standardized-audio-context';
 import {AudioContext} from 'standardized-audio-context'
 import {OpusDecoder as WasmOpusDecoder} from "opus-decoder";
-import type {Logger} from "./logger/Logger.ts";
-import {LoggerFactory} from "./logger/LoggerFactory.ts";
+import type {Logger} from "./shared/logger/logger.ts";
+import {LoggerFactory} from "./shared/logger/loggerFactory.ts";
 
 function getPersistentValue(key: string, defaultValue: string = ""): string {
     if (window.localStorage) {

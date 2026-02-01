@@ -1,4 +1,4 @@
-import {Logger} from "./Logger.ts";
+import {Logger} from "./logger.ts";
 
 export class LoggerFactory {
     private static _instance: LoggerFactory = new LoggerFactory();

@@ -7,6 +7,8 @@ import {Settings} from "./Settings.tsx";
 import {useLogger} from "../hooks/useLogger.ts";
 import {selectUserStarted} from "../store/selectors/userSelector.ts";
 import {useSelector} from "react-redux";
+import {Monitor} from "./Monitor.tsx";
+import {AppLayout} from "../app/AppLayout.tsx";
 
 
 export const MainPage: React.FC = () => {
@@ -25,15 +27,44 @@ export const MainPage: React.FC = () => {
 
 
     return (
-        <div className="content w-full h-full">
-            <Sidebar page={page} onNavigate={setPage}/>
+        <AppLayout sidebar={<Sidebar page={page} onNavigate={setPage}/>}
+                   playerbar={<MasterPlayerBar/>}
+                   content={<main
+                       className="flex h-full justify-center items-center justify-items-center"
+                       style={{gridArea: "content", borderRadius: "16px"}}>
+                       {page === "main" && <Main/>}
+                       {page === "monitor" && <Monitor/>}
+                       {page === "settings" && <Settings/>}
 
-            <main className="border-2 " style={{gridArea: "content"}}>
-                {page === "main" && <Main/>}
-                {page === "settings" && <Settings/>}
-            </main>
-            <MasterPlayerBar/>
-        </div>
+                   </main>}>
+        </AppLayout>
+        // <div className="main-container gap-4 grid w-full  p-12">
+        //     <aside style={{gridArea: "sidebar"}}>
+        //         <Glass className="h-full">
+        //             <Sidebar page={page} onNavigate={setPage}/>
+        //         </Glass>
+        //
+        //     </aside>
+        //
+        //     <Glass className="overflow-x-hidden overflow-y-auto">
+        //         <main
+        //             className="flex h-full justify-center items-center justify-items-center"
+        //             style={{gridArea: "content", borderRadius: "16px"}}>
+        //             {page === "main" && <Main/>}
+        //             {page === "monitor" && <Monitor/>}
+        //             {page === "settings" && <Settings/>}
+        //
+        //         </main>
+        //     </Glass>
+        //
+        //
+        //     <section style={{gridArea: "playerbar", position: "relative"}}>
+        //         <Glass className="h-full">
+        //             <MasterPlayerBar/>
+        //         </Glass>
+        //     </section>
+        //
+        // </div>
 
 
     )

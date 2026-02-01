@@ -20,6 +20,9 @@ func NewHub(listenPort int) *Hub {
 				Path: "/ws",
 				Port: listenPort,
 			},
+			Monitor: MonitorConfig{
+				Port: 3000,
+			},
 		},
 	}
 }

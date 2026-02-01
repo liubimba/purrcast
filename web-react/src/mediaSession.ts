@@ -2,8 +2,8 @@ import snapcast from "./assets/snapcast-512.png";
 import {SnapStream} from "./snapstream.ts";
 import type {SnapControl} from "./snapcontrol.ts";
 import silence from "./assets/10-seconds-of-silence.mp3";
-import type {Logger} from "./logger/Logger.ts";
-import {LoggerFactory} from "./logger/LoggerFactory.ts";
+import type {Logger} from "./shared/logger/logger.ts";
+import {LoggerFactory} from "./shared/logger/loggerFactory.ts";
 
 export class MediaSession {
     private snapstream: SnapStream | null = null;

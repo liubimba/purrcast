@@ -6,12 +6,14 @@ import {
     type PayloadAction,
     type UnknownAction
 } from "@reduxjs/toolkit";
-import {ConnectionStatus, type ISnapcastService, SnapcastServiceFactory} from "../services/SnapcastService.ts";
+import {type ISnapcastService, SnapcastServiceFactory} from "../services/SnapcastService.ts";
 import {Snapcast} from "../snapcontrol.ts";
 import {masterPlayerSlice} from "./masterPlayerSlice.ts";
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
 import {configurationSlice, type SnapserverConfig} from "./configurationSlice.ts";
+import {selectWebsocketUrl} from "./selectors/configurationSelector.ts";
+import {ConnectionStatus} from "../shared/client/entity/status.ts";
 
 const name = "snapcast";
 
@@ -106,8 +108,8 @@ export const createSnapcastMiddleware = (): Middleware => {
             }
             if (configurationSlice.actions.setSnapserverConfiguration.match(action)) {
                 const config = action.payload as SnapserverConfig;
-                const url = `ws://${store.getState().configuration.host}:${config.ports.http}`;
-
+                const url = selectWebsocketUrl(store.getState(), config.ports.http);
+                console.log("HERE", url);
                 store.dispatch({
                     type: snapcastSlice.actions.connect.type,
                     payload: url
