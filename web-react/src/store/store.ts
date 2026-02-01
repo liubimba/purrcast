@@ -4,6 +4,7 @@ import {masterPlayerSlice} from "./masterPlayerSlice.ts";
 import {createSnapcastMiddleware, snapcastSlice} from "./snapcastSlice.ts";
 import {configurationSlice, createConfigurationMiddleware} from "./configurationSlice.ts";
 import {userSlice} from "./userSlice.ts";
+import {createMonitorMiddleware, monitorSlice} from "./monitorSlice.ts";
 
 export const store = configureStore({
     reducer: {
@@ -12,11 +13,13 @@ export const store = configureStore({
         control: controlSlice.reducer,
         configuration: configurationSlice.reducer,
         user: userSlice.reducer,
+        monitor: monitorSlice.reducer,
     },
     middleware: getDefaultMiddleware => getDefaultMiddleware()
         .concat(createConfigurationMiddleware())
         .concat(createControlMiddleware())
         .concat(createSnapcastMiddleware())
+        .concat(createMonitorMiddleware())
 });
 
 export type RootState = ReturnType<typeof store.getState>;

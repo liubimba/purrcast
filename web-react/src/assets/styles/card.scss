@@ -1,0 +1,99 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap");
+
+$clr-blue: #1890ff;
+$clr-green: #01c3a8;
+$clr-orange: #ffb741;
+$clr-red: #a63d2a;
+
+
+.card {
+  color: #ddd;
+  min-height: 230px;
+  border-radius: 16px;
+
+  .card-heading {
+    font-size: 2em;
+    font-weight: 900;
+    transform: scaleY(1.2);
+  }
+}
+
+.green {
+  background: radial-gradient(
+                  ellipse at right top,
+                  #10e35f70 0%,
+                  #15141911 47%,
+                  #15141901 100%
+  );
+
+  &:before {
+    background: linear-gradient(
+                    45deg,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #01c3a8
+    ) border-box;
+  }
+}
+
+.blue {
+  background: radial-gradient(
+                  ellipse at right top,
+                  #00458f8f 0%,
+                  #151419 45%,
+                  #151419 100%
+  );
+
+  &:before {
+    background: linear-gradient(
+                    45deg,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #1890ff
+    ) border-box;
+  }
+}
+
+.orange {
+  background: radial-gradient(
+                  ellipse at right top,
+                  #ffb74194 0%,
+                  #151419 47%,
+                  #151419 100%
+  );
+
+  &:before {
+    background: linear-gradient(
+                    45deg,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #ffb741
+    ) border-box;
+  }
+}
+
+.red {
+  background: radial-gradient(
+                  ellipse at right top,
+                  #a63d2a82 0%,
+                  #151419 47%,
+                  #151419 100%
+  );
+
+  &:before {
+    background: linear-gradient(
+                    45deg,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #232228,
+                    #a63d2a
+    ) border-box;
+  }
+}

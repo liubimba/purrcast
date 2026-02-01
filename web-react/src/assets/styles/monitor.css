@@ -1,0 +1,12 @@
+.monitor-container {
+}
+
+.monitor-heading {
+    /*letter-spacing: 0.5em;*/
+    color: #dddddd;
+    opacity: 0.34;
+    font-size: 10cap;
+    line-height: 0.8;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}

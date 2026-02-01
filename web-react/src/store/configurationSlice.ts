@@ -6,16 +6,11 @@ import {
     type PayloadAction,
     type UnknownAction
 } from "@reduxjs/toolkit";
-import {LoggerFactory} from "../logger/LoggerFactory.ts";
-import type {Logger} from "../logger/Logger.ts";
+import {LoggerFactory} from "../shared/logger/loggerFactory.ts";
+import type {Logger} from "../shared/logger/logger.ts";
 import {controlSlice} from "./controlSlice.ts";
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
-
-interface ConfigResponse {
-    snapserver: SnapserverConfig;
-    websocket: WebsocketConfig;
-}
 
 export interface SnapserverPorts {
     http: number,
@@ -32,11 +27,22 @@ export interface WebsocketConfig {
     port: number
 }
 
+export interface MonitorConfig {
+    port: number,
+}
+
 export interface ConfigurationProps {
     host: string,
     port: number,
     websocket: WebsocketConfig,
     snapserver: SnapserverConfig,
+    monitor: MonitorConfig,
+}
+
+interface ConfigResponse {
+    snapserver: SnapserverConfig;
+    websocket: WebsocketConfig;
+    monitor: MonitorConfig;
 }
 
 const defaultSnapserverConfig = (): SnapserverConfig => {
@@ -55,12 +61,20 @@ const defaultWebsocketConfig = (): WebsocketConfig => {
         port: -1
     }
 }
+
+const defaultMonitorConfig = (): MonitorConfig => {
+    return {
+        port: -1
+    }
+}
+
 const name: string = "configuration";
 const initialState: ConfigurationProps = {
     host: window.location.hostname,
     port: Number(8080),
     websocket: defaultWebsocketConfig(),
-    snapserver: defaultSnapserverConfig()
+    snapserver: defaultSnapserverConfig(),
+    monitor: defaultMonitorConfig()
 }
 
 export const configurationSlice = createSlice({
@@ -78,6 +92,9 @@ export const configurationSlice = createSlice({
         },
         setSnapserverConfiguration: (state, action: PayloadAction<SnapserverConfig>) => {
             state.snapserver = action.payload as SnapserverConfig;
+        },
+        setMonitorConfiguration: (state, action: PayloadAction<MonitorConfig>) => {
+            state.monitor = action.payload;
         },
         connect: () => {
         }
@@ -99,10 +116,12 @@ export const createConfigurationMiddleware = (): Middleware => {
                     store.dispatch(
                         configurationSlice.actions.setSnapserverConfiguration(json.snapserver)
                     );
-
                     store.dispatch(
                         configurationSlice.actions.setWebsocketConfiguration(json.websocket)
                     );
+                    store.dispatch(
+                        configurationSlice.actions.setMonitorConfiguration(json.monitor)
+                    )
                 })
                 .catch(err => {
                     logger.error("Failed to fetch config:", err);
@@ -112,6 +131,9 @@ export const createConfigurationMiddleware = (): Middleware => {
                     store.dispatch(
                         configurationSlice.actions.setWebsocketConfiguration(defaultWebsocketConfig())
                     );
+                    store.dispatch(
+                        configurationSlice.actions.setMonitorConfiguration(defaultMonitorConfig())
+                    )
                 });
         };
         return (next) =>
