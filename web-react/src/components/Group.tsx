@@ -3,6 +3,7 @@ import * as React from "react";
 import {useSnapcast} from "../hooks/useSnapcast.ts";
 import {useSelector} from "react-redux";
 import {selectClientsByGroupId, selectStreamById} from "../store/selectors/snapcastSelector.ts";
+import {Player} from "../player/components/Player.tsx";
 
 interface RoomProps {
     group: Snapcast.Group;
@@ -41,52 +42,20 @@ export const Group = (props: RoomProps) => {
         return <></>;
     }
 
+    console.log(clients);
     return (
-        <div className="border-2">
-            <div>
-                {stream ? stream.id : "Undefined"}
-            </div>
-            {/*<StreamsList server={props.server} onSelectStream={onSelectedStream}/>*/}
-
+        <div className="">
             {clients.map((client) => (
-                <div key={client.id} className="border-2 border-gray-200">
-                    <MuteButton onMutedToggle={() => {
-                        setClientMuted(client.id, !client.config.volume.muted);
-                    }} muted={client.config.volume.muted}/>
-
-                    <VolumeSlider volume={client.config.volume.percent} onVolumeChanged={(volume: number): void => {
-                        setClientVolume(client.id, volume);
-                    }}/>
-
-
-                    {/*<label htmlFor="latency">*/}
-                    {/*    Latency*/}
-                    {/*</label>*/}
-                    {/*<input type="number"*/}
-                    {/*       className="border-2 "*/}
-                    {/*       id={`${client.id}-latency`}*/}
-                    {/*       value={latency}*/}
-                    {/*       name="latency"*/}
-                    {/*       onChange={(event) =>*/}
-                    {/*           onLatencyChanged(Number(event.target.value))*/}
-                    {/*       }/>*/}
-
-
-                    {/*<label htmlFor={`${client.id}-name`}>*/}
-                    {/*    Name*/}
-                    {/*</label>*/}
-                    {/*<input type="string"*/}
-                    {/*       className="border-2 "*/}
-                    {/*       id={`${client.id}-name`}*/}
-                    {/*       value={name}*/}
-                    {/*       name="name"*/}
-                    {/*       onChange={(event) =>*/}
-                    {/*           onNameChanged(event.target.value)*/}
-                    {/*       }/>*/}
-
-                    {/*<input type="range" min={0} max={100} value={props.volume}*/}
-                    {/*       onChange={e => props.onChange(Number(e.target.value))}/>*/}
-                </div>
+                <Player key={client.id}
+                        name={client.host.name}
+                        muted={client.config.volume.muted}
+                        volume={client.config.volume.percent}
+                        onVolumeChanged={(volume: number) => {
+                            setClientVolume(client.id, volume);
+                        }}
+                        onMutedToggle={() => {
+                            setClientMuted(client.id, !client.config.volume.muted);
+                        }}/>
             ))}
         </div>
     )

@@ -15,15 +15,16 @@ import './assets/styles/card.scss'
 import './assets/styles/monitor.css'
 import './assets/styles/shadow.css'
 import './assets/styles/appLayout.css'
+
+
 import App from './App.tsx'
 import {Provider} from "react-redux";
 import {store} from "./store/store.ts";
-import {BackgroundLayer} from "./components/BackgroundLayer.tsx";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <Provider store={store}>
-            <BackgroundLayer/>
+            {/*<BackgroundLayer/>*/}
             <App/>
         </Provider>
     </StrictMode>,

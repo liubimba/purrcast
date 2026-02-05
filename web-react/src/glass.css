@@ -5,9 +5,9 @@
 }
 
 .glass-intensity-medium {
-    --glass-blur: 100px;
-    --glass-noise-opacity: 0.06;
-    --glass-tint: rgba(0, 255, 255, 0.12);
+    --glass-blur: 10px;
+    --glass-noise-opacity: 1;
+    --glass-tint: rgba(255, 255, 255, 0.12);
 }
 
 .glass-intensity-high {
@@ -27,8 +27,9 @@
     position: relative;
     isolation: isolate;
     border-radius: var(--glass-radius);
+    border-color: rgba(255, 255, 255, 0.2);
     box-shadow: var(--glass-shadow);
-
+    border-right-width: 1px;
     background: linear-gradient(var(--glass-tint), var(--glass-tint));
 
     backdrop-filter: blur(var(--glass-blur));
@@ -45,7 +46,7 @@
     left: 0;
     right: 0;
     opacity: 0.1;
-    background-image: url("/src/assets/noise.png");
+    /*background-image: url("/src/assets/noise.png");*/
     mix-blend-mode: overlay;
     background-repeat: repeat;
 }
