@@ -1,8 +1,8 @@
-import {memo, useEffect} from "react"
+import {useEffect} from "react"
 import {App} from '../assets/js/background';
 
 
-export const BackgroundLayer = memo(function BackgroundLayer() {
+export const BackgroundLayer = () => {
     useEffect(() => {
         const app = new App();
         app.init();
@@ -12,4 +12,4 @@ export const BackgroundLayer = memo(function BackgroundLayer() {
             <div className="custom-cursor" id="customCursor"></div>
         </div>
     )
-})
+}
