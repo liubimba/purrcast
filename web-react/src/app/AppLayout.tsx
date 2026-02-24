@@ -1,20 +1,31 @@
 import {memo, useRef} from "react";
 
 interface AppLayoutProps {
-    sidebar: React.ReactNode;
+    header: React.ReactNode;
     content: React.ReactNode;
     playerbar: React.ReactNode;
+    info: React.ReactNode;
 }
 
 
-export const AppLayout = memo(function AppLayout({sidebar, content, playerbar}: AppLayoutProps) {
+export const AppLayout = memo(function AppLayout({header, content, playerbar, info}: AppLayoutProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className="app-layout" ref={containerRef}>
-            <aside className="app-sidebar glass glass-intensity-high">{sidebar}</aside>
-            <main className="app-content  glass-intensity-high flex justify-center items-center">{content}</main>
-            <footer className="app-playerbar  glass glass-intensity-high">{playerbar}</footer>
+            <header className="app-header app-wrapper  app-border">{header}</header>
+            <main className="app-content app-wrapper  app-border">
+                <h2 className="app-title">CONTROLS</h2>
+                {content}
+            </main>
+            <div className="app-info app-wrapper app-border">
+                <h2 className="app-title text-center">INFO</h2>
+                {info}
+            </div>
+            <footer className="app-playerbar app-wrapper  app-border">
+                <h2 className="app-title">MASTER</h2>
+                {playerbar}
+            </footer>
         </div>
     )
 });

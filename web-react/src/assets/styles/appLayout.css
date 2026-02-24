@@ -1,29 +1,51 @@
 .app-layout {
-    padding: 16px;
-    height: 100dvh !important;
+    padding: 42px;
+    height: 100dvh;
     display: grid;
-    grid-gap: 40px;
-    grid-template-columns: 240px 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-columns: 1fr 622px;
+    grid-template-rows: 110px 1fr 300px; /* три строки под три area */
     overflow: hidden;
+    grid-template-areas:
+        "header  header"
+        "content info"
+        "playerbar info";
+    gap: 24px;
+    background: #F5EDE7;
 }
 
-.app-sidebar {
-    grid-row: 1 / -1;
-    grid-column: 1;
+.app-wrapper {
+    padding-inline: 16px;
+}
+
+.app-header {
+    grid-area: header;
     overflow-y: auto;
 }
 
 .app-content {
-    grid-column: 2;
-    grid-row: 1;
-    overflow: auto;
+    grid-area: content;
+    overflow-y: auto;
     min-height: 0;
 }
 
 .app-playerbar {
-    grid-column: 2;
-    grid-row: 2;
-    position: sticky;
-    bottom: 0;
+    grid-area: playerbar;
 }
+
+.app-info {
+    grid-area: info;
+    overflow-y: auto;
+    min-height: 0;
+    max-width: 622px;
+}
+
+.app-border {
+    border-width: 4px;
+    border-radius: 4px;
+}
+
+.app-title {
+    font-size: 48px;
+    font-weight: 900;
+}
+
