@@ -24,3 +24,12 @@
     font-style: normal;
     font-display: swap;
 }
+
+/* Extra Bold */
+@font-face {
+    font-family: 'Syne';
+    src: url('/src/assets/fonts/syne/Syne-ExtraBold.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
