@@ -1,0 +1,46 @@
+.header-container {
+    --block-height: 64px;
+
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+}
+
+.header-block {
+    height: var(--block-height);
+    flex: 1;
+    border-radius: 0 !important;
+}
+
+.header-main {
+    height: calc(var(--block-height) * 2);
+    position: relative;
+    border-radius: 0 !important;
+    width: 970px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-title {
+    flex: 1;
+    font-weight: 900;
+    font-size: 20px;
+    z-index: 99;
+    text-transform: uppercase;
+    position: relative;
+    text-align: center;
+    color: #4F1A1A;
+}
+
+
+.header-title-active {
+}
+
+.header-fit-text {
+    position: absolute;
+    top: 0;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    pointer-events: none;
+}

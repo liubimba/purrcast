@@ -1,0 +1,9 @@
+.wave {
+    border-radius: 0 !important;
+    border-inline-width: 0 !important;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+    position: relative;
+}
