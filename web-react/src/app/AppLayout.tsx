@@ -12,20 +12,23 @@ export const AppLayout = memo(function AppLayout({header, content, playerbar, in
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div className="app-layout" ref={containerRef}>
-            <header className="app-header app-wrapper  app-border">{header}</header>
-            <main className="app-content app-wrapper  app-border">
-                <h2 className="app-title">CONTROLS</h2>
-                {content}
-            </main>
-            <div className="app-info app-wrapper app-border">
-                <h2 className="app-title text-center">INFO</h2>
-                {info}
+        <div className="app-container">
+            <header className="app-header">{header}</header>
+            <div className="app-layout" ref={containerRef}>
+                <main className="app-content app-wrapper  app-border">
+                    <h2 className="app-title">CONTROLS</h2>
+                    {content}
+                </main>
+                <div className="app-info app-wrapper app-border">
+                    <h2 className="app-title text-center">INFO</h2>
+                    {info}
+                </div>
+                <footer className="app-playerbar app-wrapper  app-border">
+                    <h2 className="app-title">MASTER</h2>
+                    {playerbar}
+                </footer>
             </div>
-            <footer className="app-playerbar app-wrapper  app-border">
-                <h2 className="app-title">MASTER</h2>
-                {playerbar}
-            </footer>
         </div>
+
     )
 });

@@ -1,16 +1,19 @@
-.app-layout {
-    padding: 42px;
+.app-container {
+    background: #F5EDE7;
     height: 100dvh;
+}
+
+.app-layout {
+    height: 100%;
+    padding: 42px;
     display: grid;
     grid-template-columns: 1fr 622px;
     grid-template-rows: 110px 1fr 300px; /* три строки под три area */
     overflow: hidden;
     grid-template-areas:
-        "header  header"
         "content info"
         "playerbar info";
     gap: 24px;
-    background: #F5EDE7;
 }
 
 .app-wrapper {
