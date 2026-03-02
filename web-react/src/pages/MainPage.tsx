@@ -5,10 +5,10 @@ import {useLogger} from "../hooks/useLogger.ts";
 import {selectUserStarted} from "../store/selectors/userSelector.ts";
 import {useSelector} from "react-redux";
 import {AppLayout} from "../app/AppLayout.tsx";
-import {Main} from "./Main.tsx";
 import {Info} from "../info/components/Info.tsx";
 import {Header} from "../header/components/Header.tsx";
 import {About} from "../about/components/About.tsx";
+import {Controls} from "../controls/components/Controls.tsx";
 
 
 class Paginator {
@@ -64,7 +64,7 @@ export const MainPage: React.FC = () => {
             info={<Info/>}
             header={<Header page={page} pages={paginator.current.pages} onNavigate={handleNavigate}/>}
             playerbar={<MasterPlayerBar/>}
-            content={page == "main" ? <Main/> : page === "about" ? <About/> : <></>}
+            content={page == "multiroom" ? <Controls/> : page === "about" ? <About/> : <></>}
         >
         </AppLayout>
     )

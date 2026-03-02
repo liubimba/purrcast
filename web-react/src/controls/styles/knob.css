@@ -1,0 +1,65 @@
+.knob-container {
+    position: relative;
+    user-select: none;
+    cursor: ns-resize;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+}
+
+.knob-arc {
+    --a: 45deg;
+    aspect-ratio: 1;
+    width: 90%;
+    position: absolute;
+    border-width: 2px;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    background: black;
+    transform: translate(-50%, -50%);
+    mask: linear-gradient(#0000 0, #0000 0) content-box intersect,
+    conic-gradient(#000 var(--a), #0000 0);
+}
+
+.knob-arc-line {
+    position: absolute;
+    width: 0;
+    height: 5%;
+    border-width: 1px;
+    left: 50%;
+}
+
+
+.knob-circle {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border-width: 2px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 10000px;
+    box-shadow: 0 4px 0 black;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.knob-dot {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    background: black;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.knob-line {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    border-width: 1px;
+    height: 24px;
+}

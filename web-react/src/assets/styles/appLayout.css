@@ -8,7 +8,7 @@
     padding: 42px;
     display: grid;
     grid-template-columns: 1fr 622px;
-    grid-template-rows: 110px 1fr 300px; /* три строки под три area */
+    grid-template-rows: 1fr 300px; /* три строки под три area */
     overflow: hidden;
     grid-template-areas:
         "content info"
@@ -48,7 +48,7 @@
 }
 
 .app-title {
-    font-size: 48px;
+    font-size: clamp(12px, 3cqi, 48px);
     font-weight: 900;
 }
 
