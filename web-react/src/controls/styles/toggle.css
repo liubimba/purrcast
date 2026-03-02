@@ -1,0 +1,41 @@
+.toggle-container {
+    width: 70px;
+    transition: all 2s;
+}
+
+.toggle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 32px;
+    width: 70px;
+    border-radius: 16px;
+    border-width: 2px;
+    padding-inline: 16px;
+}
+
+.toggle-rhombus {
+    background: #000000;
+    border-radius: 1px;
+    transform: rotate(45deg);
+    height: 8px;
+    aspect-ratio: 1;
+}
+
+.toggle-footer {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 8px;
+}
+
+.toggle-line {
+    background: #000000;
+    height: 11px;
+    border-width: 1px;
+    width: 0;
+}
+
+.toggle-text {
+    font-weight: 900;
+    font-size: 8px
+}

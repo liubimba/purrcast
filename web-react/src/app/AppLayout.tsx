@@ -16,7 +16,6 @@ export const AppLayout = memo(function AppLayout({header, content, playerbar, in
             <header className="app-header">{header}</header>
             <div className="app-layout" ref={containerRef}>
                 <main className="app-content app-wrapper  app-border">
-                    <h2 className="app-title">CONTROLS</h2>
                     {content}
                 </main>
                 <div className="app-info app-wrapper app-border">
