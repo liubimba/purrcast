@@ -4,6 +4,7 @@
     cursor: ns-resize;
     height: 100%;
     aspect-ratio: 1 / 1;
+    overflow: hidden;
 }
 
 .knob-arc {
