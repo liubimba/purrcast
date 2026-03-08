@@ -1,0 +1,16 @@
+.module-report-container {
+    filter: drop-shadow(4px 4px 0 var(--color-shadow)) drop-shadow(-2px 0 0 var(--color-shadow)) drop-shadow(2px 0 0 var(--color-shadow)) drop-shadow(0 -2px 0 var(--color-shadow)) drop-shadow(0 2px 0 var(--color-shadow));
+}
+
+.module-report-wrapper {
+    height: 232px;
+    --knob-radius: 50px;
+    --knob-offset: 60%;
+    --line-width: 10px;
+
+    mask: radial-gradient(circle var(--knob-radius) at var(--knob-offset), transparent 100%, #000 100%),
+    repeating-linear-gradient(to bottom, black, black 15px, transparent 15px, transparent 25px),
+    repeating-linear-gradient(to right, black, black calc(var(--knob-offset) - var(--line-width) / 2), transparent calc(var(--knob-offset) - var(--line-width) / 2), transparent calc(var(--knob-offset) + var(--line-width) / 2));
+    mask-composite: subtract;
+    transition: all 1s;
+}

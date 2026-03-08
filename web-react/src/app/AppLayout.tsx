@@ -12,7 +12,7 @@ export const AppLayout = memo(function AppLayout({header, content, playerbar, in
     const containerRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div className="app-container">
+        <div className="app-container bg-primary">
             <header className="app-header">{header}</header>
             <div className="app-layout" ref={containerRef}>
                 <main className="app-content app-wrapper  app-border">
@@ -30,6 +30,5 @@ export const AppLayout = memo(function AppLayout({header, content, playerbar, in
                 </footer>
             </div>
         </div>
-
     )
 });

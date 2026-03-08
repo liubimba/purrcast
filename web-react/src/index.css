@@ -1,3 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #F5EDE7;
+    --color-secondary: #F59E0B;
+    --color-background: #FFFFFF;
+    --color-shadow: #000;
+    --color-text: #111827;
+    --color-error: #BF4B4C;
+    --color-success: #C1CBBF;
+}
+
+/* dark‑mode переменные */
+[data-theme="dark"] {
+    --color-primary: #3B82F6;
+    --color-secondary: #FBBF24;
+    --color-background: #111827;
+    --color-text: #F9FAFB;
+}
+
 body {
     font-family: 'Syne', sans-serif;
     margin: 0;
