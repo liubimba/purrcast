@@ -1,5 +1,6 @@
 .control-container {
     max-width: 792px;
+    overflow: hidden;
 }
 
 

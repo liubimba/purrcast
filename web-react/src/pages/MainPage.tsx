@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {MasterPlayerBar} from "../components/MasterPlayerBar.tsx";
 import {useLogger} from "../hooks/useLogger.ts";
 import {selectUserStarted} from "../store/selectors/userSelector.ts";
 import {useSelector} from "react-redux";
@@ -9,6 +8,8 @@ import {Info} from "../info/components/Info.tsx";
 import {Header} from "../header/components/Header.tsx";
 import {About} from "../about/components/About.tsx";
 import {Controls} from "../controls/components/Controls.tsx";
+import {MasterPlayer} from "../master/components/MasterPlayer.tsx";
+import {useMasterPlayer} from "../hooks/useMasterPlayer.ts";
 
 
 class Paginator {
@@ -59,11 +60,15 @@ export const MainPage: React.FC = () => {
         }
     }, [page]);
 
+    const {masterVolume, masterMuted, updateMasterVolume, updateMasterMuted} = useMasterPlayer();
+
     return (
         <AppLayout
             info={<Info/>}
             header={<Header page={page} pages={paginator.current.pages} onNavigate={handleNavigate}/>}
-            playerbar={<MasterPlayerBar/>}
+            playerbar={<MasterPlayer gain={10} volume={masterVolume} muted={masterMuted}
+                                     onVolumeChange={updateMasterVolume}
+                                     onMutedChange={updateMasterMuted}/>}
             content={page == "multiroom" ? <Controls/> : page === "about" ? <About/> : <></>}
         >
         </AppLayout>

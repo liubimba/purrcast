@@ -1,6 +1,7 @@
 .toggle-container {
     width: 70px;
     transition: all 2s;
+    align-content: center;
 }
 
 .toggle-header {

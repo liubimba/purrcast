@@ -22,9 +22,11 @@ export const AppLayout = memo(function AppLayout({header, content, playerbar, in
                     <h2 className="app-title text-center">INFO</h2>
                     {info}
                 </div>
-                <footer className="app-playerbar app-wrapper  app-border">
+                <footer className="app-playerbar flex flex-col app-wrapper app-border">
                     <h2 className="app-title">MASTER</h2>
-                    {playerbar}
+                    <div className="flex-1 h-full">
+                        {playerbar}
+                    </div>
                 </footer>
             </div>
         </div>
