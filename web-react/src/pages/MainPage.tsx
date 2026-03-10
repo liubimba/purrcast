@@ -76,12 +76,31 @@ export const MainPage: React.FC = () => {
 
     return (
         <AppLayout
-            info={<Info reports={[TEST_MODULE_REPORT]}/>}
+            info={{
+                node: <Info reports={[TEST_MODULE_REPORT]}/>,
+                title: "MONITOR"
+            }}
+
             header={<Header page={page} pages={paginator.current.pages} onNavigate={handleNavigate}/>}
-            playerbar={<MasterPlayer gain={10} volume={masterVolume} muted={masterMuted}
-                                     onVolumeChange={updateMasterVolume}
-                                     onMutedChange={updateMasterMuted}/>}
-            content={page == "multiroom" ? <Controls/> : page === "about" ? <About/> : <></>}
+
+            playerbar={{
+                node: <MasterPlayer gain={10} volume={masterVolume} muted={masterMuted}
+                                    onVolumeChange={updateMasterVolume}
+                                    onMutedChange={updateMasterMuted}/>,
+                title: "MASTER"
+            }}
+
+            content={
+                page == "multiroom" ? {
+                    node: <Controls/>,
+                    title: "CONTROLS"
+                } : page === "about" ? {
+                    node: <About/>,
+                    title: "ABOUT"
+                } : {
+                    node: <></>,
+                    title: "UNDEFINED"
+                }}
         >
         </AppLayout>
     )

@@ -15,7 +15,7 @@ export const MasterGain: React.FC<GainProps> = ({gain}: GainProps) => {
     }
 
     return (
-        <div className="master-gain-wrapper px-2 py-4">
+        <div className="master-gain-wrapper px-2 py-4 min-w-10">
             <div className="flex flex-col-reverse h-full gap-y-0.5">
                 {Array.from(Array(segmentsCount).keys()).map((_, i) => (
                     <div key={i} className="flex flex-row flex-1 gap-2">
