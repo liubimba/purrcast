@@ -9,7 +9,19 @@ interface InfoProps {
 
 export const Info: React.FC<InfoProps> = ({reports}: InfoProps) => {
     return (
-        <div>
+        <div className="p-4 flex flex-col  gap-8">
+            {reports.map(report =>
+                <ModuleReport report={report} key={report.module_name}/>
+            )}
+            {reports.map(report =>
+                <ModuleReport report={report} key={report.module_name}/>
+            )}
+            {reports.map(report =>
+                <ModuleReport report={report} key={report.module_name}/>
+            )}
+            {reports.map(report =>
+                <ModuleReport report={report} key={report.module_name}/>
+            )}
             {reports.map(report =>
                 <ModuleReport report={report} key={report.module_name}/>
             )}

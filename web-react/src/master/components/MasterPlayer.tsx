@@ -19,10 +19,10 @@ export const MasterPlayer: React.FC<MasterPlayerProps> = ({
                                                               onVolumeChange
                                                           }: MasterPlayerProps) => {
     return (
-        <div className="flex gap-24 align-center justify-center h-full">
+        <div className="flex gap-24  align-center justify-center">
             <MasterGain gain={gain}/>
             <div className="flex flex-1 flex-wrap gap-12">
-                <MasterVolumeBar volume={volume} onVolumeChanged={onVolumeChange}/>
+                <MasterVolumeBar className="flex-1" volume={volume} onVolumeChanged={onVolumeChange}/>
                 <Toggle muted={muted} onToggle={() => {
                     onMutedChange(!muted);
                 }}/>

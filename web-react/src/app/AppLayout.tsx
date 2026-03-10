@@ -1,34 +1,64 @@
-import {memo, useRef} from "react";
+import * as React from "react";
+import {memo} from "react";
+
+
+export interface ContentProps {
+    node: React.ReactNode;
+    title: string;
+}
 
 interface AppLayoutProps {
     header: React.ReactNode;
-    content: React.ReactNode;
-    playerbar: React.ReactNode;
-    info: React.ReactNode;
+    content: ContentProps;
+    playerbar: ContentProps;
+    info: ContentProps;
 }
 
-
-export const AppLayout = memo(function AppLayout({header, content, playerbar, info}: AppLayoutProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
-
+export const AppLayout = memo(function AppLayout({
+                                                     header,
+                                                     content,
+                                                     playerbar,
+                                                     info,
+                                                 }: AppLayoutProps) {
     return (
-        <div className="app-container bg-primary">
-            <header className="app-header">{header}</header>
-            <div className="app-layout" ref={containerRef}>
-                <main className="app-content app-wrapper  app-border">
-                    {content}
-                </main>
-                <div className="app-info app-wrapper app-border">
-                    <h2 className="app-title text-center">INFO</h2>
-                    {info}
-                </div>
-                <footer className="app-playerbar flex flex-col app-wrapper app-border">
-                    <h2 className="app-title">MASTER</h2>
-                    <div className="flex-1 h-full">
-                        {playerbar}
+        <div className="flex gap-8 flex-col h-screen bg-primary">
+            <header>{header}</header>
+            <div
+                className="m-8 grid  gap-6 md:grid-cols-[1fr_auto] md:grid-rows-[1fr_auto] gap-6p-10 min-h-0 grid-cols-1 grid-rows-[auto_auto_auto]">
+                <main
+                    className="md:overflow-y-auto min-h-0 md:panel flex flex-col">
+                    <div className="md:sticky px-4 pt-4 top-0 z-10 backdrop-blur-3xl bg-transparent">
+                        <h2 className="grid-title max-sm:text-center">
+                            {content.title}
+                        </h2>
                     </div>
+
+                    <div className="px-4 max-sm:overflow-y-auto max-sm:panel min-h-  max-sm:p-4 pb-4">
+                        {content.node}
+                    </div>
+                </main>
+
+                <div
+                    className="md:overflow-y-auto md:row-span-2 flex flex-col min-h-0 md:panel">
+                    <div className="px-4 pt-4 md:sticky top-0 z-10 backdrop-blur-3xl">
+                        <h2 className="text-center grid-title">
+                            {info.title}
+                        </h2>
+                    </div>
+
+                    <div className="max-sm:panel max-sm:overflow-y-auto pb-4">
+                        {info.node}
+                    </div>
+                </div>
+
+                <footer
+                    className="flex flex-col md:panel p-4">
+                    <h2 className="grid-title max-sm:text-center">
+                        {playerbar.title}
+                    </h2>
+                    <div className="max-sm:panel max-sm:p-4 ">{playerbar.node}</div>
                 </footer>
             </div>
         </div>
-    )
+    );
 });

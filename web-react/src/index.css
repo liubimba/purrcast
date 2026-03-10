@@ -1,6 +1,22 @@
 @import "tailwindcss";
 
+@utility panel {
+    border: 4px solid black;
+    border-radius: 4px;
+}
+
+@utility grid-title {
+    font-weight: 900;
+    font-size: clamp(12px, 3cqi, 48px);
+}
+
+
 @theme {
+    --breakpoint-sm: 768px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1200px;
+    --breakpoint-xl: 1536px;
+
     --color-primary: #F5EDE7;
     --color-secondary: #F59E0B;
     --color-background: #FFFFFF;
