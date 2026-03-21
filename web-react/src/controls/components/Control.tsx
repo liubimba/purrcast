@@ -1,19 +1,10 @@
 import '../styles/control.css'
 import * as React from "react";
-import {useEffect, useState} from "react";
 import {VolumeBar} from "./VolumeBar.tsx";
 import {Knob} from "./Knob.tsx";
 import {Toggle} from "./Toggle.tsx";
+import type {ControlProps} from "../entity/ControlProps.ts";
 
-interface ControlProps {
-    volume: number,
-    muted: boolean,
-    name: string,
-    index: number,
-    className?: string,
-    onVolumeChange?: (volume: number) => void,
-    onMutedChange?: (muted: boolean) => void,
-}
 
 export const Control: React.FC<ControlProps> = ({
                                                     volume,
@@ -71,28 +62,5 @@ export const Control: React.FC<ControlProps> = ({
             </div>
 
         </div>
-    )
-}
-
-export const TestControl = () => {
-    const [volume, setVolume] = useState(32);
-    const [muted, setMuted] = useState(true);
-
-    useEffect(() => {
-        let increasing = true;
-        const interval = setInterval(() => {
-            setVolume(prev => {
-                if (prev >= 100) increasing = false;
-                if (prev <= 0) increasing = true;
-                return increasing ? prev + 1 : prev - 1;
-            });
-        }, 20); // 100 шагов за 2 секунды = 20ms на шаг
-
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <Control volume={volume} muted={muted} name={"test"} index={1} onVolumeChange={setVolume}
-                 onMutedChange={setMuted}/>
     )
 }

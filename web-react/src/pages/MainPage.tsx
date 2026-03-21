@@ -9,8 +9,7 @@ import {Header} from "../header/components/Header.tsx";
 import {About} from "../about/components/About.tsx";
 import {Controls} from "../controls/components/Controls.tsx";
 import {MasterPlayer} from "../master/components/MasterPlayer.tsx";
-import {useMasterPlayer} from "../hooks/useMasterPlayer.ts";
-import type {ModuleReportEntity} from "../info/entity/ModuleReportEntity.ts";
+import {ServerBoard} from "../server/components/ServerBoard.tsx";
 
 
 class Paginator {
@@ -61,32 +60,18 @@ export const MainPage: React.FC = () => {
         }
     }, [page]);
 
-    const {masterVolume, masterMuted, updateMasterVolume, updateMasterMuted} = useMasterPlayer();
-
-    const TEST_MODULE_REPORT: ModuleReportEntity = {
-        module_name: "Module name",
-        health_checker: "Health checker",
-        module_status: {
-            state: "failed",
-            timestamp: Date.now().toString(),
-            message: "Lorem ipsum dolor sit amet, consetetur",
-        }
-    }
-
 
     return (
         <AppLayout
             info={{
-                node: <Info reports={[TEST_MODULE_REPORT]}/>,
+                node: <Info/>,
                 title: "MONITOR"
             }}
 
             header={<Header page={page} pages={paginator.current.pages} onNavigate={handleNavigate}/>}
 
-            playerbar={{
-                node: <MasterPlayer gain={10} volume={masterVolume} muted={masterMuted}
-                                    onVolumeChange={updateMasterVolume}
-                                    onMutedChange={updateMasterMuted}/>,
+            playerBar={{
+                node: <MasterPlayer gain={10}/>,
                 title: "MASTER"
             }}
 
@@ -101,6 +86,11 @@ export const MainPage: React.FC = () => {
                     node: <></>,
                     title: "UNDEFINED"
                 }}
+
+            serverBoard={{
+                node: <ServerBoard/>,
+                title: "SERVER"
+            }}
         >
         </AppLayout>
     )

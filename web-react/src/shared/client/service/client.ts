@@ -56,7 +56,7 @@ export class Client<E extends ValidEventMap<E> & ClientEvents> extends EventEmit
             this.emit("connectionStatus", ConnectionStatus.DISCONNECTED);
         }
         this._websocket.onmessage = (event: MessageEvent) => {
-            this._logger.info("On message:", event);
+            this._logger.debug("On message:", event);
             this.emit("onMessage", JSON.parse(event.data) as Message);
         }
         this._url = url;

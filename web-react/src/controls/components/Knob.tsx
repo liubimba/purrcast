@@ -58,41 +58,50 @@ class Angle {
         return Math.round((this._angle - this._minAngle) / (this._maxAngle - this._minAngle) * 100);
     }
 
-    public setValue(v: number) {
+    public set value(v: number) {
         this._angle = this._minAngle + v * (this._maxAngle - this._minAngle);
     }
 }
 
 export const Knob: React.FC<KnobProps> = ({volume = 50, onChange}) => {
-    const angle = useRef<Angle>(new Angle(-135, 135, volume));
-    const [rotation, setRotation] = useState(() => angle.current.degree);
+    const angleRef = useRef<Angle>(new Angle(-135, 135, volume));
+    const volumeRef = useRef<number>(volume);
+
+    const [rotation, setRotation] = useState(() => angleRef.current.degree);
 
     useEffect(() => {
-        angle.current.setValue(volume / 100);
-        setRotation(angle.current.degree);
+        volumeRef.current = volume;
+        angleRef.current.value = volume / 100;
+
+        setRotation(angleRef.current.degree);
     }, [volume]);
 
-    const onMouseDown = (_: React.MouseEvent): void => {
-        angle.current.drag();
+    const onMouseDown = (): void => {
+        angleRef.current.drag();
     };
 
     const onMouseMove = (e: MouseEvent): void => {
-        const volume: number = angle.current.moved(e.clientY);
-        onChange?.(volume);
+        if (angleRef.current.isDragging) {
+            const movedVolume: number = angleRef.current.moved(e.clientY);
+            if (movedVolume !== volumeRef.current) {
+                onChange?.(movedVolume);
+            }
+        }
     };
 
     const onMouseUp = (): void => {
-        angle.current.release();
+        angleRef.current.release();
     };
 
     useEffect(() => {
-        window.addEventListener("mousemove", onMouseMove);
         window.addEventListener("mouseup", onMouseUp);
+        window.addEventListener("mousemove", onMouseMove);
         return () => {
-            window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("mouseup", onMouseUp);
-        };
+            window.removeEventListener("mousemove", onMouseMove);
+        }
     }, []);
+
 
     return (
         <div
@@ -100,7 +109,7 @@ export const Knob: React.FC<KnobProps> = ({volume = 50, onChange}) => {
             style={{rotate: `${rotation}deg`}}
             onMouseDown={onMouseDown}
         >
-            <div style={{rotate: "-10deg"}} className="w-full h-full">
+            <div className="w-full h-full -rotate-[10deg]">
                 <div className="knob-arc-line"/>
                 <div className="knob-arc"/>
             </div>

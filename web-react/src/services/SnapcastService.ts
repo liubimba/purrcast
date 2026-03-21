@@ -91,6 +91,7 @@ export class LocalSnapcastService extends EventEmitter implements ISnapcastServi
     }
 
     public setVolumeClient(clientId: string, volume: number): void {
+        console.log("client ", volume);
         this._snapcontrol.setVolume(clientId, volume, this._snapcontrol.getClient(clientId).config.volume.muted);
     }
 
