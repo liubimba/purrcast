@@ -17,6 +17,7 @@ export const MasterVolumeBar: React.FC<MasterVolumeBarProps> = ({
 
     const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         const value: number = Number(event.target.value);
+        console.log(value);
         onVolumeChanged(value);
     }
 
