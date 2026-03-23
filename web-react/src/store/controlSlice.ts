@@ -8,17 +8,23 @@ import {
 } from "@reduxjs/toolkit";
 import {masterPlayerSlice} from "./masterPlayerSlice.ts";
 import {ControlService} from "../services/ControlService.ts";
-import {SnapStream} from "../snapstream.ts";
+import {SnapStream} from "../shared/snapcast/snapstream.ts";
 import AsyncLock from "async-lock"
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
-import {ConnectionStatus} from "../shared/client/entity/status.ts";
+import {type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
+
+interface ControlSliceState {
+    url: string,
+    connectionStatus: ConnectionStatus,
+}
 
 const name = "control"
 
-const initialState = {
+
+const initialState: ControlSliceState = {
     url: "ws://127.0.0.1:8080" as string,
-    connected: false as boolean
+    connectionStatus: ConnectionStatusFactory.disconnected(),
 }
 
 export const controlSlice = createSlice({
@@ -28,11 +34,8 @@ export const controlSlice = createSlice({
         connect: (state, action: PayloadAction<string>) => {
             state.url = action.payload;
         },
-        connected: (state) => {
-            state.connected = true;
-        },
-        disconnected: (state) => {
-            state.connected = false;
+        setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
+            state.connectionStatus = action.payload;
         }
     }
 })
@@ -42,12 +45,8 @@ export const createControlMiddleware = (): Middleware => {
     const lock = new AsyncLock();
 
     return (store: MiddlewareAPI<Dispatch<UnknownAction>, RootState>) => {
-        service.on("connectionStatus", (status: string) => {
-            if (status === ConnectionStatus.CONNECTED) {
-                store.dispatch(controlSlice.actions.connected());
-            } else {
-                store.dispatch(controlSlice.actions.disconnected());
-            }
+        service.on("connectionStatus", (status: ConnectionStatus) => {
+            store.dispatch(controlSlice.actions.setConnectionStatus(status));
         })
         service.on("masterPlayer", (volume: number, muted: boolean) => {
             store.dispatch({

@@ -11,6 +11,7 @@ import type {Logger} from "../shared/logger/logger.ts";
 import {controlSlice} from "./controlSlice.ts";
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
+import {type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
 
 export interface SnapserverPorts {
     http: number,
@@ -34,6 +35,7 @@ export interface MonitorConfig {
 export interface ConfigurationProps {
     host: string,
     port: number,
+    connectionStatus: ConnectionStatus,
     websocket: WebsocketConfig,
     snapserver: SnapserverConfig,
     monitor: MonitorConfig,
@@ -74,7 +76,8 @@ const initialState: ConfigurationProps = {
     port: Number(8080),
     websocket: defaultWebsocketConfig(),
     snapserver: defaultSnapserverConfig(),
-    monitor: defaultMonitorConfig()
+    monitor: defaultMonitorConfig(),
+    connectionStatus: ConnectionStatusFactory.disconnected()
 }
 
 export const configurationSlice = createSlice({
@@ -97,6 +100,9 @@ export const configurationSlice = createSlice({
             state.monitor = action.payload;
         },
         connect: () => {
+        },
+        setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
+            state.connectionStatus = action.payload as ConnectionStatus;
         }
     }
 })
@@ -107,6 +113,7 @@ export const createConfigurationMiddleware = (): Middleware => {
     return (store: MiddlewareAPI<Dispatch<UnknownAction>, RootState>) => {
         const connect = (url: string) => {
             logger.info(`Fetching configuration from ${url}`);
+            store.dispatch(configurationSlice.actions.setConnectionStatus(ConnectionStatusFactory.connecting()));
 
             fetch(url)
                 .then(res => res.json())
@@ -121,7 +128,10 @@ export const createConfigurationMiddleware = (): Middleware => {
                     );
                     store.dispatch(
                         configurationSlice.actions.setMonitorConfiguration(json.monitor)
-                    )
+                    );
+                    store.dispatch(
+                        configurationSlice.actions.setConnectionStatus(ConnectionStatusFactory.connected())
+                    );
                 })
                 .catch(err => {
                     logger.error("Failed to fetch config:", err);
@@ -133,6 +143,9 @@ export const createConfigurationMiddleware = (): Middleware => {
                     );
                     store.dispatch(
                         configurationSlice.actions.setMonitorConfiguration(defaultMonitorConfig())
+                    )
+                    store.dispatch(
+                        configurationSlice.actions.setConnectionStatus(ConnectionStatusFactory.failed(err.message))
                     )
                 });
         };

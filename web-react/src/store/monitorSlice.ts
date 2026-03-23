@@ -9,9 +9,9 @@ import {
 import type {RootState} from "./store.ts";
 import {configurationSlice, type MonitorConfig} from "./configurationSlice.ts";
 import {selectWebsocketUrl} from "./selectors/configurationSelector.ts";
-import {MonitorService} from "../monitor/service/monitorService.ts";
-import {ConnectionStatus} from "../shared/client/entity/status.ts";
-import type {ModuleReport} from "../monitor/module/moduleReport.ts";
+import {MonitorService} from "../components/monitor/service/monitorService.ts";
+import {type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
+import type {ModuleReport} from "../components/monitor/module/moduleReport.ts";
 
 interface MonitorState {
     url: string;
@@ -22,7 +22,7 @@ interface MonitorState {
 const name = "monitor";
 const initialState: MonitorState = {
     url: "",
-    connectionStatus: ConnectionStatus.DISCONNECTED,
+    connectionStatus: ConnectionStatusFactory.disconnected(),
     reports: [],
 };
 
@@ -33,7 +33,7 @@ export const monitorSlice = createSlice({
         connect: (state, action: PayloadAction<string>) => {
             state.url = action.payload;
         },
-        connectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
+        setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
             state.connectionStatus = action.payload;
         },
         setReports(state, action: PayloadAction<ModuleReport[]>) {
@@ -45,9 +45,9 @@ export const monitorSlice = createSlice({
 export const createMonitorMiddleware = (): Middleware => {
     return (store: MiddlewareAPI<Dispatch<UnknownAction>, RootState>) => {
         const monitor: MonitorService = new MonitorService();
-        monitor.on("connectStatus", (status: ConnectionStatus) => {
+        monitor.on("connectionStatus", (status: ConnectionStatus) => {
             store.dispatch({
-                type: monitorSlice.actions.connectionStatus.type,
+                type: monitorSlice.actions.setConnectionStatus.type,
                 payload: status
             })
         })
