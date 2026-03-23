@@ -1,11 +1,11 @@
-import {Snapcast, SnapControl} from "../snapcontrol.ts";
-import {SnapStream} from "../snapstream.ts";
+import {Snapcast, SnapControl} from "../shared/snapcast/snapcontrol.ts";
+import {SnapStream} from "../shared/snapcast/snapstream.ts";
 import {Logger} from "../shared/logger/logger.ts";
 import {LoggerFactory} from "../shared/logger/loggerFactory.ts";
 import {EventEmitter} from "events";
 import snapcast from "../assets/snapcast-512.png";
 import silence from "../assets/10-seconds-of-silence.mp3";
-import {ConnectionStatus} from "../shared/client/entity/status.ts";
+import {ConnectionState, type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
 
 
 interface ISnapcastServiceEvents {
@@ -42,7 +42,7 @@ export interface ISnapcastService {
 export class LocalSnapcastService extends EventEmitter implements ISnapcastService {
     protected _logger: Logger;
     protected _url: string | null = null;
-    protected _connectionStatus: ConnectionStatus = ConnectionStatus.DISCONNECTED;
+    protected _connectionStatus: ConnectionStatus = ConnectionStatusFactory.disconnected();
     protected _snapserver: Snapcast.Server = Snapcast.getDefaultServer();
     protected _snapcontrol: SnapControl = new SnapControl();
 
@@ -58,20 +58,20 @@ export class LocalSnapcastService extends EventEmitter implements ISnapcastServi
 
     public connect(url: string) {
         this._url = url;
-        this._connectionStatus = ConnectionStatus.CONNECTING;
+        this._connectionStatus = ConnectionStatusFactory.connecting();
         this._snapcontrol.connect(url);
     }
 
     public disconnect() {
         if (this.url !== null) {
             this._url = null;
-            this._connectionStatus = ConnectionStatus.DISCONNECTED;
+            this._connectionStatus = ConnectionStatusFactory.disconnected();
             this._snapcontrol.disconnect();
         }
     }
 
     public get connected(): boolean {
-        return this._connectionStatus === ConnectionStatus.CONNECTED;
+        return this._connectionStatus.state === ConnectionState.CONNECTED;
     }
 
     public get connectionStatus() {
@@ -91,7 +91,6 @@ export class LocalSnapcastService extends EventEmitter implements ISnapcastServi
     }
 
     public setVolumeClient(clientId: string, volume: number): void {
-        console.log("client ", volume);
         this._snapcontrol.setVolume(clientId, volume, this._snapcontrol.getClient(clientId).config.volume.muted);
     }
 
@@ -122,11 +121,11 @@ export class LocalSnapcastService extends EventEmitter implements ISnapcastServi
     protected _onConnectionChanged(_control: SnapControl, connected: boolean, error: string | undefined): void {
         if (connected) {
             this._logger.info("Connected to:", this._url);
-            this.connectionStatus = ConnectionStatus.CONNECTED;
+            this.connectionStatus = ConnectionStatusFactory.connected();
         } else {
             this._logger.error("Failed to connect to:", this._url, ". Error: ", error ?? "undefined");
             this.snapserver = Snapcast.getDefaultServer();
-            this.connectionStatus = ConnectionStatus.FAILED;
+            this.connectionStatus = ConnectionStatusFactory.failed(error);
         }
     };
 

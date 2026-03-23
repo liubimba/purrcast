@@ -1,7 +1,7 @@
 import './App.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {WelcomePage} from "./welcome/components/WelcomePage.tsx";
-import {MainPage} from "./pages/MainPage.tsx";
+import {WelcomePage} from "./pages/welcome/components/WelcomePage.tsx";
+import {MainPage} from "./pages/main/components/MainPage.tsx";
 
 function App() {
     return (

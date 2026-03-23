@@ -6,7 +6,7 @@ import {snapcastSlice} from "../store/snapcastSlice.ts";
 export const useSnapcast = () => {
     const dispatch = useDispatch();
 
-    const connected = useSelector((state: RootState) => state.snapcast.connected);
+    const connectionStatus = useSelector((state: RootState) => state.snapcast.connectionStatus);
     const snapserver = useSelector((state: RootState) => state.snapcast.snapserver);
 
     const setClientVolume = useCallback((clientId: string, volume: number) => {
@@ -32,6 +32,6 @@ export const useSnapcast = () => {
         setClientMuted: setClientMuted,
         setClientVolume: setClientVolume,
         snapserver: snapserver,
-        connected: connected,
+        connectionStatus: connectionStatus,
     };
 }

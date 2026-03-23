@@ -1,7 +1,7 @@
 import {EventEmitter} from "events";
 import type {Logger} from "../../logger/logger.ts";
 import type {ClientEvents} from "../events/clientEvents.ts";
-import {ConnectionStatus} from "../entity/status.ts";
+import {ConnectionStatusFactory} from "../entity/status.ts";
 import type {Message} from "../message/message.ts";
 
 type ValidEventMap<T> = {
@@ -39,21 +39,21 @@ export class Client<E extends ValidEventMap<E> & ClientEvents> extends EventEmit
         if (this._websocket == null) {
             throw Error(`Failed to connect: ${url}`);
         }
-        this.emit("connectionStatus", ConnectionStatus.CONNECTING);
+        this.emit("connectionStatus", ConnectionStatusFactory.connecting());
         this._websocket.onopen = (event: Event) => {
             this._logger.info("Connection opened:", event);
-            this.emit("connectionStatus", ConnectionStatus.CONNECTED);
+            this.emit("connectionStatus", ConnectionStatusFactory.connected());
             this._queue.forEach((data: MessageData) => {
                 this.send(data);
             })
         }
         this._websocket.onerror = (event: Event) => {
             this._logger.error("Connection error:", event);
-            this.emit("connectionStatus", ConnectionStatus.FAILED);
+            this.emit("connectionStatus", ConnectionStatusFactory.failed());
         }
         this._websocket.onclose = (event: CloseEvent) => {
             this._logger.info("Connection closed:", event);
-            this.emit("connectionStatus", ConnectionStatus.DISCONNECTED);
+            this.emit("connectionStatus", ConnectionStatusFactory.disconnected(event.reason));
         }
         this._websocket.onmessage = (event: MessageEvent) => {
             this._logger.debug("On message:", event);
