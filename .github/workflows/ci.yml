@@ -50,8 +50,8 @@ jobs:
         env: 
           CG0_ENABLED: 0
         run: |
-          mkdir -p artifacts/bin/
-          go build -C backend-go -o ../artifacts/bin/backend-go .
+          mkdir -p artifacts/backend-go/
+          go build -C backend-go -o ../artifacts/backend-go/backend-go .
 
       - name: Build launcher-cpp
         run: |
@@ -70,4 +70,24 @@ jobs:
       
       - name: Confirm build
         run: |
-          ls -lh artifacts/*
+          echo ===BACKEND-GO=====
+          ls -lh artifacts/backend-go/*
+          echo ==================
+          echo ===LAUNCHER-CPP===
+          ls -lh artifacts/launcher-cpp/*
+          echo ==================
+          echo ==WEB-REACT=======
+          ls -lh artifacts/web-react/*
+          echo ==================
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-linux-amd64
+          path: |
+            artifacts/backend-go/
+            artifacts/web-react/
+            artifacts/config/
+            artifacts/launcher-cpp/bin
+            artifacts/launcher-cpp/lib
+          retention-days: 7
