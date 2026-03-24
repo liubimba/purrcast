@@ -48,23 +48,23 @@ jobs:
 
       - name: Build backend-go
         env: 
-          CG0_ENABLED: 0
+          CGO_ENABLED: 0
         run: |
           mkdir -p artifacts/backend-go/
           go build -C backend-go -o ../artifacts/backend-go/backend-go .
 
       - name: Build launcher-cpp
         run: |
-          cmake -S launcher-cpp -B artifacts/launcher-cpp -DCMAKE_BUILD_TYPE=Release
+          cmake -S launcher-cpp -B artifacts/launcher-cpp -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
           cmake --build artifacts/launcher-cpp --config Release --parallel $(nproc)
-          
+
       - name: Build web-react
         run: |
           cd web-react
           npm ci
           npm run build
           cp -r dist ../artifacts/web-react
-          
+
       - name: Copy config
         run: cp -r config artifacts/config
       
