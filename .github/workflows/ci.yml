@@ -80,14 +80,39 @@ jobs:
           ls -lh artifacts/web-react/*
           echo ==================
           
+      - name: Get short SHA
+        id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-linux-amd64
+          name: build-linux-amd64-${{ github.ref_name }}-${{ steps.sha.outputs.short }}
           path: |
             artifacts/backend-go/
             artifacts/web-react/
             artifacts/config/
             artifacts/launcher-cpp/bin
-            artifacts/launcher-cpp/lib
           retention-days: 7
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup up GO
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24"
+          cache-dependency-path: backend-go/go.sum
+          
+      - name: Run Go tests
+        run: |
+          cd backend-go
+          go test ./... -v -timeout 60s
+      
+      - name: Go vet
+        run: |
+          cd backend-go
+          go vet ./...
