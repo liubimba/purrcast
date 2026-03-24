@@ -4,19 +4,29 @@ on:
   push:
     branches:
       - main
+      - MUL-44
 jobs:
   hello:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Hello"
-        run: echo "Runned!"
+      - name: Checkout
+        uses: actions/checkout@v4
         
-      - name: Смотрим на каком Ubuntu мы запущены
-        run: lsb_release -a
+      - name: Set up GO
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache-dependency-path: backend-go/go.sum
 
-      - name: Смотрим что уже установлено
+      - name: Build backend-go
         run: |
-          echo "Go:    $(go version)"
-          echo "Node:  $(node --version)"
-          echo "CMake: $(cmake --version | head -1)"
+          go build -C backend-go -o ../artifacts/bin/backend-go ./...
+
+      - name: Confirm build
+        run: |
+          echo "Size of binary file:"
+          ls -lh artifacts/bin/backend-go
+          
+          echo "File type:"
+          file artifacts/bin/backend-go
