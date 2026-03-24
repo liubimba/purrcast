@@ -1,0 +1,3 @@
+[submodule "launcher-cpp/libs/argparse"]
+	path = launcher-cpp/libs/argparse
+	url = https://github.com/p-ranav/argparse

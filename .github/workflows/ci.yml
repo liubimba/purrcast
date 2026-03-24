@@ -20,7 +20,12 @@ jobs:
             libboost-all-dev \
             libpulse-dev \
             libasound2-dev \
-            pkg-config
+            pkg-config \
+            libavahi-client-dev \
+            libflac-dev \
+            libogg-dev \
+            libvorbis-dev \
+            libopus-dev
 
       - name: Set up GO
         uses: actions/setup-go@v5
