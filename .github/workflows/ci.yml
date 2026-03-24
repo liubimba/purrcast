@@ -116,3 +116,13 @@ jobs:
         run: |
           cd backend-go
           go vet ./...
+
+      - name: Build launcher-cpp tests
+        run: |
+          cmake -S launcher-cpp -B build-test -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTS=ON
+          cmake --build build-test --config Debug --parallel $(nproc)
+
+      - name: Run launcher-cpp tests
+        run: |
+          cd build-test
+          ctest --output-on-failure
