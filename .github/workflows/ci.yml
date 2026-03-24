@@ -21,6 +21,7 @@ jobs:
 
       - name: Build backend-go
         run: |
+          mkdir -p artifacts/bin/
           go build -C backend-go -o ../artifacts/bin/backend-go ./...
 
       - name: Confirm build
