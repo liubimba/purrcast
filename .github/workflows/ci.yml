@@ -142,8 +142,7 @@ jobs:
             -B build-test \
             -DCMAKE_BUILD_TYPE=Debug \
             -DBUILD_SHARED_LIBS=OFF \
-            -DBUILD_TESTS=ON \
-            -DSNAPCAST_BUILD_TESTS=OFF \
+            -DBUILD_MULTIROOM_TESTS=ON \
             -DBUILD_TESTING=OFF
           cmake --build build-test \
             --config Debug \

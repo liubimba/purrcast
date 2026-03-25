@@ -52,7 +52,7 @@ option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 option(ENABLE_DEBUG_FLAGS "Enable debug flags and optimizations" OFF)
-option(BUILD_TESTS "Build and run tests" OFF)
+option(BUILD_MULTIROOM_TESTS "Build and run multiroom tests" OFF)
 
 add_executable(multiroom
         launcher/launcher.cpp
@@ -148,7 +148,7 @@ if (ENABLE_TSAN AND NOT ENABLE_ASAN)
     target_link_libraries(multiroom PRIVATE -fsanitize=thread)
 endif ()
 
-if (RUN_TESTS)
+if (BUILD_MULTIROOM_TESTS)
     include(FetchContent)
     set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
