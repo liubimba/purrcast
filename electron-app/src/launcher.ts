@@ -141,7 +141,7 @@ export class Launcher extends EventEmitter implements Launcher {
 
         this.start_({
             server: {
-                path: path.join(artifacts, "backend-go", "backend"),
+                path: path.join(artifacts, "backend-go", "backend-go"),
                 port: await this._portManager.allocate(),
                 static: path.join(artifacts, "web-react"),
             },
@@ -160,7 +160,7 @@ export class Launcher extends EventEmitter implements Launcher {
     private async startProd_() {
         this.start_({
             server: {
-                path: path.join(process.resourcesPath, "bin", "backend"),
+                path: path.join(process.resourcesPath, "bin", "backend-go"),
                 port: await this._portManager.allocate(),
                 static: path.join(process.resourcesPath, "static")
             },

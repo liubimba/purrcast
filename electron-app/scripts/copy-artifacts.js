@@ -24,8 +24,8 @@ async function main() {
         await fse.copy(src, dest);
     }
 
-    const backendSrc = path.join(artifactsPath, "backend-go", "backend");
-    const backendDest = path.join(binTarget, "backend");
+    const backendSrc = path.join(artifactsPath, "backend-go", "backend-go");
+    const backendDest = path.join(binTarget, "backend-go");
     await fse.copy(backendSrc, backendDest);
 
     await fse.copy(
