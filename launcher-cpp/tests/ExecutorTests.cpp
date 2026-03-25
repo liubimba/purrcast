@@ -8,7 +8,7 @@
 
 TEST(Executor, post)
 {
-    task_executor executor{TestData::services(), TestData::uuid()};
+    task_executor executor{TestData::get_services(), TestData::uuid()};
     std::future<void> future = executor.post<void>([=]()
     {
     });
@@ -18,7 +18,7 @@ TEST(Executor, post)
 
 TEST(Executor, run_return_task)
 {
-    task_executor executor{TestData::services(), TestData::uuid()};
+    task_executor executor{TestData::get_services(), TestData::uuid()};
     auto f = executor.post<int>([]() { return 123; });
     ASSERT_EQ(f.get(), 123);
     executor.join();
@@ -26,7 +26,7 @@ TEST(Executor, run_return_task)
 
 TEST(Executor, many_tasks)
 {
-    task_executor executor{TestData::services(), TestData::uuid()};
+    task_executor executor{TestData::get_services(), TestData::uuid()};
 
     auto f1 = executor.post<int>([]() { return 1; });
     auto f2 = executor.post<int>([]() { return 2; });
@@ -41,7 +41,7 @@ TEST(Executor, many_tasks)
 
 TEST(Executor, exception_propagates)
 {
-    task_executor executor{TestData::services(), TestData::uuid()};
+    task_executor executor{TestData::get_services(), TestData::uuid()};
 
     auto f = executor.post<void>([]() { throw std::runtime_error("boom"); });
 
@@ -52,7 +52,7 @@ TEST(Executor, exception_propagates)
 
 TEST(Executor, join_stops_loop)
 {
-    task_executor executor{TestData::services(), TestData::uuid()};
+    task_executor executor{TestData::get_services(), TestData::uuid()};
     executor.join();
     ASSERT_THROW(executor.post<void>([]{}), std::runtime_error);
 }
@@ -60,7 +60,7 @@ TEST(Executor, join_stops_loop)
 TEST(Executor, destructor_joins)
 {
     {
-        task_executor executor{TestData::services(), TestData::uuid()};
+        task_executor executor{TestData::get_services(), TestData::uuid()};
         executor.post<void>([]()
         {
         });
@@ -70,7 +70,7 @@ TEST(Executor, destructor_joins)
 
 TEST(Executor, multithread_post)
 {
-    task_executor executor{TestData::services(), TestData::uuid()};
+    task_executor executor{TestData::get_services(), TestData::uuid()};
     constexpr int THREAD_COUNT = 100;
     constexpr int TASKS_PER_THREAD = 50;
     std::vector<std::thread> threads;

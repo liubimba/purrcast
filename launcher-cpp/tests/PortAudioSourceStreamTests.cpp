@@ -8,10 +8,10 @@ TEST(PortAudioSourceStream, start)
 {
     Pa_Initialize();
     audio_stream_params params;
-    port_audio_source_stream stream{TestData::services(), TestData::uuid()};
-    ASSERT_FALSE(stream.start(params));
+    port_audio_source_stream stream{TestData::get_services(), TestData::uuid()};
+    ASSERT_FALSE(stream.start(params).is_ok);
     params.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    ASSERT_TRUE(stream.start(params));
+    ASSERT_TRUE(stream.start(params).is_ok);
     ASSERT_ANY_THROW(stream.start(params));
     Pa_Terminate();
 }
@@ -21,10 +21,10 @@ TEST(PortAudioSourceStream, stop)
     Pa_Initialize();
     audio_stream_params params;
     params.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    port_audio_source_stream stream{TestData::services(), TestData::uuid()};
+    port_audio_source_stream stream{TestData::get_services(), TestData::uuid()};
     ASSERT_ANY_THROW(stream.stop());
-    ASSERT_TRUE(stream.start(params));
-    ASSERT_TRUE(stream.stop());
+    ASSERT_TRUE(stream.start(params).is_ok);
+    ASSERT_TRUE(stream.stop().is_ok);
     Pa_Terminate();
 }
 
@@ -33,9 +33,9 @@ TEST(PortAudioSourceStream, started)
     Pa_Initialize();
     audio_stream_params params;
     params.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    port_audio_source_stream stream{TestData::services(), TestData::uuid()};
+    port_audio_source_stream stream{TestData::get_services(), TestData::uuid()};
     ASSERT_FALSE(stream.started());
-    ASSERT_TRUE(stream.start(params));
+    ASSERT_TRUE(stream.start(params).is_ok);
     ASSERT_TRUE(stream.started());
     Pa_Terminate();
 }

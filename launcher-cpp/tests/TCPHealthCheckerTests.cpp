@@ -45,7 +45,7 @@ TEST(TCPHealthChecker, status)
     Module module;
     module.m_loaded = false;
     std::initializer_list<int> ports = {1780, 1781};
-    tcp_health_checker checker(&module, TestData::services(), ports);
+    tcp_health_checker checker(&module, TestData::get_services(), ports);
     ASSERT_EQ(checker.check(), health_status::unhealthy);
     module.m_loaded = true;
     ASSERT_EQ(checker.check(), health_status::unhealthy);

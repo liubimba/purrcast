@@ -120,7 +120,7 @@ struct settings
                     && channels == oth.channels;
             }
 
-            std::string to_string() const override
+            [[nodiscard]] std::string to_string() const override
             {
                 nlohmann::json j = module_description::to_json();
                 j["virtualSink"] = loopback_sink_name;

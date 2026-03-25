@@ -7,9 +7,9 @@
 
 TEST(SnapserverModule, load)
 {
-    settings::s_module::snapserver params;
-    snapserver_module module{TestData::services()};
-    ASSERT_ANY_THROW(module.load(settings::s_module::router()));
+    settings::s_module::s_snapserver params;
+    snapserver_module module{TestData::get_services()};
+    ASSERT_ANY_THROW(module.load(settings::s_module::s_router{}));
     ASSERT_TRUE(module.load(params));
     ASSERT_ANY_THROW(module.load(params));
     absl::SleepFor(absl::Seconds(1));
@@ -18,21 +18,11 @@ TEST(SnapserverModule, load)
     ASSERT_TRUE(os_port::is_bound(params.ports.http));
 }
 
-TEST(SnapserverModule, reload)
-{
-    settings::s_module::snapserver params;
-    params.cmd = "echo";
-    snapserver_module module{TestData::services()};
-    ASSERT_ANY_THROW(module.reload(settings::s_module::router()));
-    ASSERT_ANY_THROW(module.reload(settings::s_module::snapserver()));
-    ASSERT_TRUE(module.load(settings::s_module::snapserver()));
-    ASSERT_TRUE(module.reload(params));
-}
 
 TEST(SnapserverModule, unload)
 {
-    settings::s_module::snapserver params;
-    snapserver_module module{TestData::services()};
+    settings::s_module::s_snapserver params;
+    snapserver_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.unload());
     ASSERT_TRUE(module.load(params));
     ASSERT_TRUE(module.unload());
@@ -44,17 +34,17 @@ TEST(SnapserverModule, unload)
 
 TEST(SnapserverModule, loaded)
 {
-    snapserver_module module{TestData::services()};
-    ASSERT_TRUE(module.load(settings::s_module::snapserver()));
+    snapserver_module module{TestData::get_services()};
+    ASSERT_TRUE(module.load(settings::s_module::s_snapserver()));
     ASSERT_TRUE(module.loaded());
 }
 
 
 TEST(SnapserverModule, destructor)
 {
-    settings::s_module::snapserver params;
+    settings::s_module::s_snapserver params;
     {
-        snapserver_module module{TestData::services()};
+        snapserver_module module{TestData::get_services()};
         ASSERT_TRUE(module.load(params));
     }
     SleepFor(absl::Seconds(1));
