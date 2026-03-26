@@ -52,7 +52,7 @@ option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 option(ENABLE_DEBUG_FLAGS "Enable debug flags and optimizations" OFF)
-option(BUILD_TESTS "Build and run tests" OFF)
+option(BUILD_MULTIROOM_TESTS "Build and run multiroom tests" OFF)
 
 add_executable(multiroom
         launcher/launcher.cpp
@@ -82,7 +82,6 @@ add_executable(multiroom
         stream/file_audio_sink_stream.cpp
         modules/test_environment/audio_inspector/fingerprint_audio_inspector.cpp
         modules/test_environment/listener/proxy_audio_sink_listener.cpp
-        stream/audio_stream_result.hpp
 )
 
 set_target_properties(snapserver PROPERTIES
@@ -148,7 +147,7 @@ if (ENABLE_TSAN AND NOT ENABLE_ASAN)
     target_link_libraries(multiroom PRIVATE -fsanitize=thread)
 endif ()
 
-if (RUN_TESTS)
+if (BUILD_MULTIROOM_TESTS)
     include(FetchContent)
     set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
@@ -180,25 +179,30 @@ if (RUN_TESTS)
             tests/PulseMainloopServiceTests.cpp
             tests/ServerModuleTests.cpp
 
-            util/os_port.cpp
-            util/linux_process.cpp
-            util/os_process.cpp
-            util/process_info.cpp
-            util/task_executor.cpp
-            launcher/launcher.cpp
             logger/logger_factory.cpp
-            modules/manager/module_manager.cpp
-            modules/snapclient/snapclient_module.cpp
             modules/snapserver/snapserver_module.cpp
-            services/pulse_audio_mainloop_service.cpp
+            modules/manager/module_manager.cpp
+            util/os_port.cpp
+            util/os_process.cpp
+            util/linux_process.cpp
+            util/task_executor.cpp
+            modules/snapclient/snapclient_module.cpp
+            util/process_info.cpp
             modules/loopback/audio_loopback_module.cpp
-            modules/router/audio_router_module.cpp
             modules/loopback/pulse_audio_loopback_module.cpp
-            modules/server/server_module.cpp
+            services/pulse_audio_mainloop_service.cpp
             stream/port_audio_source_stream.cpp
             stream/fifo_audio_sink_stream.cpp
-            health_checker/tcp_health_checker.cpp
             health_checker/internal_health_checker.cpp
+            health_checker/tcp_health_checker.cpp
+            modules/router/audio_router_module.cpp
+            modules/server/server_module.cpp
+            modules/monitor/monitor_module.cpp
+            modules/monitor/monitor_session.cpp
+            modules/test_environment/test_environment.cpp
+            stream/file_audio_sink_stream.cpp
+            modules/test_environment/audio_inspector/fingerprint_audio_inspector.cpp
+            modules/test_environment/listener/proxy_audio_sink_listener.cpp
     )
 
     target_link_libraries(multiroom_tests PUBLIC

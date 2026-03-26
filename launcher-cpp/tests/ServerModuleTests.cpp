@@ -12,7 +12,7 @@ TEST(ServerModule, load)
 {
     settings::s_module::s_server params{};
     params.port = -1;
-    server_module module{TestData::services()};
+    server_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.load(settings::s_module::s_loopback()));
     ASSERT_FALSE(module.load(params));
     params.port = port;
@@ -32,7 +32,7 @@ TEST(ServerModule, reload)
 {
     settings::s_module::s_server params{};
     params.port = port;
-    server_module module{TestData::services()};
+    server_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.reload(params));
     ASSERT_ANY_THROW(module.reload(settings::s_module::s_loopback()));
     ASSERT_TRUE(module.load(params));
@@ -55,7 +55,7 @@ TEST(ServerModule, unload)
 {
     settings::s_module::s_server params{};
     params.port = port;
-    server_module module{TestData::services()};
+    server_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.unload());
     ASSERT_TRUE(module.load(params));
     ASSERT_TRUE(module.unload());
@@ -75,7 +75,7 @@ TEST(ServerModule, destructor)
     settings::s_module::s_server params{};
     params.port = port;
     {
-        server_module module{TestData::services()};
+        server_module module{TestData::get_services()};
         ASSERT_TRUE(module.load(params));
     }
     absl::SleepFor(absl::Seconds(5));

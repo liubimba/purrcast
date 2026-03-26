@@ -1,8 +1,8 @@
 {
-  "name": "app",
-  "productName": "app",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "name": "multiroom",
+  "productName": "multiroom",
+  "version": "0.1.2",
+  "description": "Turns any device on your local network into a synchronized speaker",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -14,7 +14,7 @@
   "keywords": [],
   "author": {
     "name": "bimba",
-    "email": "bimba@flashphoner.com"
+    "email": "bluerayy123@gmail.com"
   },
   "license": "MIT",
   "devDependencies": {

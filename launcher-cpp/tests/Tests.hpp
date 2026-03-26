@@ -10,7 +10,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "absl/strings/match.h"
-#include "../path/Path.hpp"
 #include "../services/services.hpp"
 #include "../logger/logger_factory.hpp"
 #include "../util/linux_process.hpp"
@@ -51,7 +50,7 @@ class TestData
     services services_;
 
 public:
-    static const services* services()
+    static const services* get_services()
     {
         return &instance().services_;
     };

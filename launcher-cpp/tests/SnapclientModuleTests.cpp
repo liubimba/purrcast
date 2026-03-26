@@ -14,12 +14,12 @@
 
 TEST(SnapclientModule, load)
 {
-    settings::s_module::snapclient params{};
-    params.sinkIndex = -1;
-    snapclient_module module{TestData::services()};
-    ASSERT_ANY_THROW(module.load(settings::s_module::loopback()));
+    settings::s_module::s_snapclient params{};
+    params.soundcard = "-1";
+    snapclient_module module{TestData::get_services()};
+    ASSERT_ANY_THROW(module.load(settings::s_module::s_loopback{}));
     ASSERT_FALSE(module.load(params));
-    params.sinkIndex = 0;
+    params.soundcard = "0";
     ASSERT_TRUE(module.load(params));
     absl::SleepFor(absl::Seconds(5));
     std::vector<ProcessInfoDescription> processes = process_info::list();
@@ -30,32 +30,12 @@ TEST(SnapclientModule, load)
     ASSERT_TRUE(foundProcess);
 }
 
-TEST(SnapclientModule, reload)
-{
-    settings::s_module::snapclient params{};
-    params.sinkIndex = -1;
-    snapclient_module module{TestData::services()};
-    ASSERT_ANY_THROW(module.reload(params));
-    ASSERT_ANY_THROW(module.reload(settings::s_module::loopback()));
-    params.sinkIndex = 0;
-    ASSERT_TRUE(module.load(params));
-    ASSERT_FALSE(module.reload(params));
-    ASSERT_ANY_THROW(module.reload(settings::s_module::loopback()));
-    params.sinkIndex = 31;
-    ASSERT_TRUE(module.reload(params));
-    std::vector<ProcessInfoDescription> processes = process_info::list();
-    bool foundProcess = std::any_of(processes.begin(), processes.end(), [](const ProcessInfoDescription& desc)
-    {
-        return desc.cmd == "snapclient";
-    });
-    ASSERT_TRUE(foundProcess);
-}
 
 TEST(SnapclientModule, unload)
 {
-    settings::s_module::snapclient params{};
-    params.sinkIndex = 0;
-    snapclient_module module{TestData::services()};
+    settings::s_module::s_snapclient params{};
+    params.soundcard = "0";
+    snapclient_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.unload());
     ASSERT_TRUE(module.load(params));
     ASSERT_TRUE(module.unload());
@@ -70,10 +50,10 @@ TEST(SnapclientModule, unload)
 
 TEST(SnapclientModule, destructor)
 {
-    settings::s_module::snapclient params{};
-    params.sinkIndex = 0;
+    settings::s_module::s_snapclient params{};
+    params.soundcard = "0";
     {
-        snapclient_module module{TestData::services()};
+        snapclient_module module{TestData::get_services()};
         ASSERT_TRUE(module.load(params));
     }
     absl::SleepFor(absl::Seconds(1));

@@ -44,7 +44,7 @@ TEST(InternalHealthChecker, status)
 {
     Module module;
     module.m_loaded = true;
-    internal_health_checker checker(&module, TestData::services());
+    internal_health_checker checker(&module, TestData::get_services());
     ASSERT_EQ(checker.check(), health_status::healthy);
     module.m_loaded = false;
     ASSERT_EQ(checker.check(), health_status::unhealthy);

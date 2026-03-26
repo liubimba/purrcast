@@ -7,11 +7,11 @@
 TEST(AudioRouterModule, load)
 {
     Pa_Initialize();
-    settings::s_module::router params{};
+    settings::s_module::s_router params{};
     params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
     params.sink.name = "/tmp/fifo";
-    audio_router_module module{TestData::services()};
-    ASSERT_ANY_THROW(module.load(settings::s_module::loopback()));
+    audio_router_module module{TestData::get_services()};
+    ASSERT_ANY_THROW(module.load(settings::s_module::s_loopback{}));
     ASSERT_TRUE(module.load(params));
     ASSERT_ANY_THROW(module.load(params));
 }
@@ -19,11 +19,11 @@ TEST(AudioRouterModule, load)
 TEST(AudioRouterModule, reload)
 {
     Pa_Initialize();
-    settings::s_module::router params{};
+    settings::s_module::s_router params{};
     params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
     params.sink.name = "/tmp/fifo";
-    audio_router_module module{TestData::services()};
-    ASSERT_ANY_THROW(module.reload(settings::s_module::loopback()));
+    audio_router_module module{TestData::get_services()};
+    ASSERT_ANY_THROW(module.reload(settings::s_module::s_loopback{}));
     ASSERT_ANY_THROW(module.reload(params));
     ASSERT_TRUE(module.load(params));
     ASSERT_FALSE(module.reload(params));
@@ -34,10 +34,10 @@ TEST(AudioRouterModule, reload)
 TEST(AudioRouterModule, unload)
 {
     Pa_Initialize();
-    settings::s_module::router params{};
+    settings::s_module::s_router params{};
     params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
     params.sink.name = "/tmp/fifo";
-    audio_router_module module{TestData::services()};
+    audio_router_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.unload());
     ASSERT_TRUE(module.load(params));
     ASSERT_TRUE(module.unload());
@@ -46,10 +46,10 @@ TEST(AudioRouterModule, unload)
 TEST(AudioRouterModule, loaded)
 {
     Pa_Initialize();
-    settings::s_module::router params{};
+    settings::s_module::s_router params{};
     params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
     params.sink.name = "/tmp/fifo";
-    audio_router_module module{TestData::services()};
+    audio_router_module module{TestData::get_services()};
     ASSERT_FALSE(module.loaded());
     ASSERT_TRUE(module.load(params));
     ASSERT_TRUE(module.loaded());
