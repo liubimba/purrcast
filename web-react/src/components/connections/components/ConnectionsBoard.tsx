@@ -59,21 +59,27 @@ const ConnectionDisplay: React.FC<{ connections: ConnectionDisplayUnit[] }> = ({
 }
 
 export const ConnectionsBoard = () => {
-    const {host, port, setHost, setPort, connections} = useConfiguration();
+    const {host, connect, connections} = useConfiguration();
 
     const units: ConnectionDisplayUnit[] = Object.entries(connections).map(([key, connectionStatus]) => ({
         title: key,
         status: connectionStatus
     } as ConnectionDisplayUnit))
 
+    const onChangedHost = (address: string | null, port: number | null) => {
+        console.log("TUTA", address, port, " -- ", address ? address : host.address, port ? port : host.port)
+        connect(address ? address : host.address, port ? port : host.port);
+    }
+
     return (
         <div className="px-4 gap-4 flex flex-col items-center h-full justify-center">
             <div className="flex flex-row gap-4 w-full">
-                <FancyForm type="text" className="flex-1" title={"host"} onChange={(e) => setHost(e.target.value)}
-                           value={host}/>
+                <FancyForm type="text" className="flex-1" title={"host"}
+                           onChange={(e) => onChangedHost(e.target.value, null)}
+                           value={host.address}/>
                 <FancyForm type="number" className="flex-1" title={"port"}
-                           onChange={(e) => setPort(Number(e.target.value))}
-                           value={port.toString()} revert={true}/>
+                           onChange={(e) => onChangedHost(null, Number(e.target.value))}
+                           value={host.port.toString()} revert={true}/>
             </div>
             <div className="w-full">
                 <ConnectionDisplay connections={units}/>

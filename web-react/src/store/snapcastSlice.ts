@@ -36,6 +36,11 @@ export const snapcastSlice = createSlice({
         connect: (state, action: PayloadAction<string>) => {
             state.url = action.payload as string;
         },
+        disconnect: (state, _) => {
+            state.url = initialState.url;
+            state.snapserver = initialState.snapserver;
+            state.connectionStatus = initialState.connectionStatus;
+        },
         setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
             state.connectionStatus = action.payload;
         },
@@ -74,46 +79,45 @@ export const createSnapcastMiddleware = (): Middleware => {
             snapcast.connect(url);
         }
 
-
         return (next) => (action) => {
             if (snapcastSlice.actions.connect.match(action)) {
                 connect(action.payload as string);
-            }
-            if (snapcastSlice.actions.setClientMuted.match(action)) {
+            } else if (snapcastSlice.actions.setClientMuted.match(action)) {
                 if (snapcast.connected) {
                     snapcast.setMutedClient(action.payload.clientId, action.payload.muted);
                 }
-            }
-
-            if (snapcastSlice.actions.setClientVolume.match(action)) {
+            } else if (snapcastSlice.actions.setClientVolume.match(action)) {
                 if (snapcast.connected) {
                     snapcast.setVolumeClient(action.payload.clientId, action.payload.volume);
                 }
-            }
-            if (masterPlayerSlice.actions.setMasterVolume.match(action)) {
+            } else if (masterPlayerSlice.actions.setMasterVolume.match(action)) {
                 if (snapcast.connected) {
                     snapcast.setVolumeAllClients(action.payload.volume);
                 }
-            }
-            if (masterPlayerSlice.actions.setMasterMuted.match(action)) {
+            } else if (masterPlayerSlice.actions.setMasterMuted.match(action)) {
                 if (snapcast.connected) {
                     snapcast.setMutedAllClients(action.payload.muted);
                 }
-            }
-            if (userSlice.actions.setUserData.match(action)) {
+            } else if (userSlice.actions.setUserData.match(action)) {
                 if (snapcast.connected) {
                     snapcast.disconnect();
                 }
                 snapcast = createSnapcastService(action.payload.isLocal);
                 snapcast.connect(store.getState().snapcast.url);
-            }
-            if (configurationSlice.actions.setSnapserverConfiguration.match(action)) {
+            } else if (configurationSlice.actions.setSnapserverConfiguration.match(action)) {
                 const config = action.payload as SnapserverConfig;
                 const url = selectWebsocketUrl(store.getState(), config.ports.http);
                 store.dispatch({
                     type: snapcastSlice.actions.connect.type,
                     payload: url
                 });
+            } else if (configurationSlice.actions.connect.match(action)) {
+                if (snapcast.connected) {
+                    snapcast.disconnect();
+                    store.dispatch({
+                        type: snapcastSlice.actions.disconnect.type,
+                    })
+                }
             }
             return next(action);
         }

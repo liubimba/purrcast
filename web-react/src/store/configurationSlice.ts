@@ -8,7 +8,6 @@ import {
 } from "@reduxjs/toolkit";
 import {LoggerFactory} from "../shared/logger/loggerFactory.ts";
 import type {Logger} from "../shared/logger/logger.ts";
-import {controlSlice} from "./controlSlice.ts";
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
 import {type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
@@ -32,19 +31,26 @@ export interface MonitorConfig {
     port: number,
 }
 
-export interface ConfigurationProps {
-    host: string,
+export interface HostProps {
+    hostname?: string,
+    address: string,
     port: number,
+}
+
+export interface ConfigurationProps {
+    host: HostProps,
     connectionStatus: ConnectionStatus,
     websocket: WebsocketConfig,
     snapserver: SnapserverConfig,
     monitor: MonitorConfig,
 }
 
+
 interface ConfigResponse {
     snapserver: SnapserverConfig;
     websocket: WebsocketConfig;
     monitor: MonitorConfig;
+    host: HostProps;
 }
 
 const defaultSnapserverConfig = (): SnapserverConfig => {
@@ -72,8 +78,10 @@ const defaultMonitorConfig = (): MonitorConfig => {
 
 const name: string = "configuration";
 const initialState: ConfigurationProps = {
-    host: window.location.hostname,
-    port: Number(8080),
+    host: {
+        address: window.location.hostname,
+        port: Number(window.location.port)
+    },
     websocket: defaultWebsocketConfig(),
     snapserver: defaultSnapserverConfig(),
     monitor: defaultMonitorConfig(),
@@ -84,12 +92,6 @@ export const configurationSlice = createSlice({
     name: name,
     initialState: initialState,
     reducers: {
-        setHost: (state, action: PayloadAction<string>) => {
-            state.host = action.payload as string;
-        },
-        setPort: (state, action: PayloadAction<number>) => {
-            state.port = action.payload as number;
-        },
         setWebsocketConfiguration: (state, action: PayloadAction<WebsocketConfig>) => {
             state.websocket = action.payload as WebsocketConfig;
         },
@@ -99,7 +101,11 @@ export const configurationSlice = createSlice({
         setMonitorConfiguration: (state, action: PayloadAction<MonitorConfig>) => {
             state.monitor = action.payload;
         },
-        connect: () => {
+        setHost: (state, action: PayloadAction<HostProps>) => {
+            state.host = action.payload;
+        },
+        connect: (state, action: PayloadAction<HostProps>) => {
+            state.host = action.payload as HostProps;
         },
         setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
             state.connectionStatus = action.payload as ConnectionStatus;
@@ -130,6 +136,9 @@ export const createConfigurationMiddleware = (): Middleware => {
                         configurationSlice.actions.setMonitorConfiguration(json.monitor)
                     );
                     store.dispatch(
+                        configurationSlice.actions.setHost(json.host)
+                    )
+                    store.dispatch(
                         configurationSlice.actions.setConnectionStatus(ConnectionStatusFactory.connected())
                     );
                 })
@@ -151,41 +160,25 @@ export const createConfigurationMiddleware = (): Middleware => {
         };
         return (next) =>
             (action) => {
-                if (configurationSlice.actions.setHost.match(action) ||
-                    configurationSlice.actions.setPort.match(action)) {
 
-                    const result = next(action);
-                    const state = store.getState().configuration;
-
-                    const api = `/api/config`;
-                    const url = `http://${state.host}:${state.port}${api}`;
-
-                    connect(url);
-                    return result;
-                }
-                if (configurationSlice.actions.setWebsocketConfiguration.match(action)) {
-                    const config = action.payload as WebsocketConfig;
-                    const url = `ws://${store.getState().configuration.host}:${config.port}${config.path}`;
-
-                    store.dispatch({
-                        type: controlSlice.actions.connect.type,
-                        payload: url
-                    });
-                }
                 if (configurationSlice.actions.connect.match(action)) {
-                    const state = store.getState().configuration;
+                    const state = action.payload as HostProps;
                     const api = `/api/config`;
-                    const url = `http://${state.host}:${state.port}${api}`;
+                    const url = `http://${state.address}:${state.port}${api}`;
 
                     connect(url);
                 }
                 if (userSlice.actions.setStarted.match(action)) {
                     if (action.payload.started) {
                         const state = store.getState().configuration;
-                        const api = `/api/config`;
-                        const url = `http://${state.host}:${state.port}${api}`;
 
-                        connect(url);
+                        store.dispatch({
+                            type: configurationSlice.actions.connect.type,
+                            payload: {
+                                address: state.host.address,
+                                port: state.host.port,
+                            }
+                        })
                     }
                 }
                 return next(action);

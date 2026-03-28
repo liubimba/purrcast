@@ -10,7 +10,7 @@ export const selectWebsocketUrl = createSelector(
         (_: RootState, __: number, path?: string) => path || ""
     ],
     (host, port, path): string | null => {
-        const urlString = `ws://${host}:${port}${path}`;
+        const urlString = `ws://${host.address}:${port}${path}`;
         return URL.canParse(urlString) ? urlString : null;
     }
 );

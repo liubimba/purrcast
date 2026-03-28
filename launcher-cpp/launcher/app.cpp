@@ -52,10 +52,6 @@ int main(int argc, char** argv)
 
             settings.module.loopback.order_of_loading = MIN_ORDER;
 
-            settings.module.server.bin = parser.get<std::string>("--server.path");
-            settings.module.server.port = std::atoi(parser.get<std::string>("--server.port").c_str());
-            settings.module.server.static_dir = parser.get<std::string>("--server.static_dir");
-
             settings.module.snapclient.path_to_binary = parser.get<std::string>("--snapclient.path");
 
             settings.module.snapserver.path_to_binary = parser.get<std::string>("--snapserver.path");
@@ -64,6 +60,11 @@ int main(int argc, char** argv)
             settings.module.monitor.interval = std::atoi(parser.get<std::string>("--monitor.interval").c_str());
             settings.module.monitor.address = parser.get<std::string>("--monitor.address");
             settings.module.monitor.port = std::atoi(parser.get<std::string>("--monitor.port").c_str());
+
+            settings.module.server.bin = parser.get<std::string>("--server.path");
+            settings.module.server.port = std::atoi(parser.get<std::string>("--server.port").c_str());
+            settings.module.server.static_dir = parser.get<std::string>("--server.static_dir");
+            settings.module.server.extra_args = absl::StrFormat("--monitor.port %d", settings.module.monitor.port);
 
             settings.module.test_environment.enabled = parser.get<std::string>("--test.enabled") == "true";
             settings.module.test_environment.loopback.module_name = "test_environment_loopback";

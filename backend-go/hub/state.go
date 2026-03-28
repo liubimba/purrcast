@@ -34,11 +34,18 @@ type MonitorConfig struct {
 	Port int `json:"port"`
 }
 
+type HostConfig struct {
+	Hostname string `json:"hostname"`
+	Address  string `json:"address"`
+	Port     int    `json:"port"`
+}
+
 type Configuration struct {
 	Master     MasterPlayerState `json:"masterPlayer"`
 	Snapserver SnapserverConfig  `json:"snapserver"`
 	Websocket  WebsocketConfig   `json:"websocket"`
 	Monitor    MonitorConfig     `json:"monitor"`
+	Host       HostConfig        `json:"host"`
 }
 
 // Hub holds connected clients and broadcast channel

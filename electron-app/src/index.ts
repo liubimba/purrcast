@@ -50,7 +50,9 @@ app.whenReady().then(async () => {
 
     await launcher.start();
     launcher.on('ready', (port: number): void => {
-        mainWindow.loadURL(`http://localhost:${port}`);
+        const url = `http://localhost:${port}/?electron=true`;
+        log.info("Loading url: ", url)
+        mainWindow.loadURL(url);
     })
 })
 // Quit when all windows are closed, except on macOS. There, it's common

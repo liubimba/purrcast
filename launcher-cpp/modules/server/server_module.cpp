@@ -36,7 +36,7 @@ bool server_module::load(const module_params& module_params)
         }
         std::unique_lock lock(mutex_);
         std::unique_ptr<os_process> process = std::make_unique<os_process>(services_, name());
-        std::string args = absl::StrFormat("--port %d --static_dir %s", params.port, params.static_dir);
+        std::string args = absl::StrFormat("--http.port %d --http.static_dir %s %s", params.port, params.static_dir, params.extra_args);
         process_result result = process->execute(params.bin, args);
         if (result.is_ok)
         {

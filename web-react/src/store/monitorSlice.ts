@@ -10,7 +10,7 @@ import type {RootState} from "./store.ts";
 import {configurationSlice, type MonitorConfig} from "./configurationSlice.ts";
 import {selectWebsocketUrl} from "./selectors/configurationSelector.ts";
 import {MonitorService} from "../components/monitor/service/monitorService.ts";
-import {type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
+import {ConnectionState, type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
 import type {ModuleReport} from "../components/monitor/module/moduleReport.ts";
 
 interface MonitorState {
@@ -33,7 +33,16 @@ export const monitorSlice = createSlice({
         connect: (state, action: PayloadAction<string>) => {
             state.url = action.payload;
         },
+        disconnect: (state, _: PayloadAction<string>) => {
+            state.url = initialState.url;
+            state.reports = initialState.reports;
+            state.connectionStatus = initialState.connectionStatus;
+        },
         setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
+            const status: ConnectionStatus = action.payload as ConnectionStatus;
+            if (state.connectionStatus.state === ConnectionState.FAILED && status.state == ConnectionState.DISCONNECTED) {
+                return;
+            }
             state.connectionStatus = action.payload;
         },
         setReports(state, action: PayloadAction<ModuleReport[]>) {
@@ -68,6 +77,11 @@ export const createMonitorMiddleware = (): Middleware => {
                 if (url) {
                     monitor.connect(url);
                 }
+            } else if (configurationSlice.actions.connect.match(action)) {
+                monitor.disconnect();
+                store.dispatch({
+                    type: monitorSlice.actions.disconnect.type
+                })
             }
             return next(action);
         }

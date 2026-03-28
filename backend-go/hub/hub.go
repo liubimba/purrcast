@@ -1,6 +1,6 @@
 package hub
 
-func NewHub(listenPort int) *Hub {
+func NewHub(httpPort int, monitorPort int, hostname string, address string) *Hub {
 	return &Hub{
 		Clients:   make(map[*Client]bool),
 		Broadcast: make(chan Envelope),
@@ -18,10 +18,15 @@ func NewHub(listenPort int) *Hub {
 			},
 			Websocket: WebsocketConfig{
 				Path: "/ws",
-				Port: listenPort,
+				Port: httpPort,
 			},
 			Monitor: MonitorConfig{
-				Port: 3000,
+				Port: monitorPort,
+			},
+			Host: HostConfig{
+				Hostname: hostname,
+				Address:  address,
+				Port:     httpPort,
 			},
 		},
 	}

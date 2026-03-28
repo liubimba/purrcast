@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - MUL-44
+      - MUL-*
     tags: ['v*']
 
 jobs:
