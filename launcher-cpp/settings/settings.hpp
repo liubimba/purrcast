@@ -70,6 +70,7 @@ struct settings
         {
             std::string bin;
             std::string static_dir;
+            std::string extra_args;
             int port = -1;
 
             s_server()
@@ -83,7 +84,7 @@ struct settings
 
             bool operator==(const s_server& other) const
             {
-                return bin == other.bin && port == other.port;
+                return bin == other.bin && port == other.port && extra_args == other.extra_args;
             }
 
             [[nodiscard]] std::string to_string() const override
@@ -92,6 +93,7 @@ struct settings
                 j["bin"] = bin;
                 j["port"] = port;
                 j["static_dir"] = static_dir;
+                j["extra_args"] = extra_args;
                 return j.dump();
             }
         };

@@ -1,5 +1,4 @@
 import * as React from "react";
-import {useNavigate} from "react-router-dom";
 import {useClient} from "../../../hooks/useClient.ts";
 import {WavyBorder} from "./WavyBorder.tsx";
 import {APP_NAME} from "../../../constants/storage.ts";
@@ -7,6 +6,7 @@ import {APP_NAME} from "../../../constants/storage.ts";
 import cat1 from "../assets/images/cat1.png";
 import cat2 from "../assets/images/cat2.png";
 import cat3 from "../assets/images/cat3.png";
+import {useNavigateWithQuery} from "../../../hooks/useNavigate.ts";
 
 const Border: React.FC<{
     className?: string;
@@ -30,7 +30,7 @@ const Border: React.FC<{
 };
 
 export const WelcomePage: React.FC<{}> = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigateWithQuery();
     const {setClientStarted} = useClient();
 
     const onClick = () => {

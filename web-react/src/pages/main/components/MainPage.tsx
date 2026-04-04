@@ -1,5 +1,4 @@
 import {useEffect, useRef, useState} from "react";
-import {useNavigate} from "react-router-dom";
 import {useLogger} from "../../../hooks/useLogger.ts";
 import {selectUserStarted} from "../../../store/selectors/userSelector.ts";
 import {useSelector} from "react-redux";
@@ -10,6 +9,7 @@ import {About} from "../../about/components/About.tsx";
 import {Controls} from "../../../components/controls/components/Controls.tsx";
 import {MasterPlayer} from "../../../components/master/components/MasterPlayer.tsx";
 import {ConnectionsBoard} from "../../../components/connections/components/ConnectionsBoard.tsx";
+import {useNavigateWithQuery} from "../../../hooks/useNavigate.ts";
 
 
 class Paginator {
@@ -42,7 +42,7 @@ class Paginator {
 export const MainPage: React.FC = () => {
     const logger = useLogger("MainPage");
     const clientStarted = useSelector(selectUserStarted());
-    const navigate = useNavigate();
+    const navigate = useNavigateWithQuery();
 
 
     const [page, setPage] = useState("multiroom");
@@ -59,7 +59,6 @@ export const MainPage: React.FC = () => {
             navigate("/");
         }
     }, [page]);
-
 
     return (
         <AppLayout

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {memo} from "react";
-
+import {AppLink} from "./AppLink.tsx";
 
 export interface ContentProps {
     node: React.ReactNode;
@@ -26,7 +26,7 @@ export const AppLayout = memo(function AppLayout({
         <div className="flex gap-8 flex-col h-screen bg-primary">
             <header>{header}</header>
             <div
-                className="m-8 grid h-full gap-6 md:grid-cols-[1fr_auto] md:grid-rows-[1fr_auto] gap-6p-10 min-h-0 grid-cols-1 grid-rows-[auto_auto_auto]">
+                className="m-8 grid flex-1 gap-6 md:grid-cols-[1fr_auto] md:grid-rows-[1fr_auto]  grid-cols-1 grid-rows-[auto_auto_auto] min-h-0">
                 <main
                     className="md:overflow-y-auto min-h-0 md:row-span-1 md:panel flex flex-col md:col-start-1 md:row-start-1">
                     <div className="md:sticky px-4 pt-4 top-0 z-10 backdrop-blur-3xl bg-transparent">
@@ -73,6 +73,8 @@ export const AppLayout = memo(function AppLayout({
                     <div className="max-sm:panel max-sm:p-4 h-full">{playerBar.node}</div>
                 </footer>
             </div>
+
+            <AppLink/>
         </div>
     );
 });

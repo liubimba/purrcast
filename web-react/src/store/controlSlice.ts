@@ -13,6 +13,7 @@ import AsyncLock from "async-lock"
 import type {RootState} from "./store.ts";
 import {userSlice} from "./userSlice.ts";
 import {type ConnectionStatus, ConnectionStatusFactory} from "../shared/client/entity/status.ts";
+import {configurationSlice, type WebsocketConfig} from "./configurationSlice.ts";
 
 interface ControlSliceState {
     url: string,
@@ -33,6 +34,10 @@ export const controlSlice = createSlice({
     reducers: {
         connect: (state, action: PayloadAction<string>) => {
             state.url = action.payload;
+        },
+        disconnect: (state, _) => {
+            state.url = initialState.url;
+            state.connectionStatus = initialState.connectionStatus;
         },
         setConnectionStatus: (state, action: PayloadAction<ConnectionStatus>) => {
             state.connectionStatus = action.payload;
@@ -81,9 +86,7 @@ export const createControlMiddleware = (): Middleware => {
                     service.disconnect();
                     service.connect(url);
                 });
-            }
-
-            if (masterPlayerSlice.actions.setMasterVolume.match(action) ||
+            } else if (masterPlayerSlice.actions.setMasterVolume.match(action) ||
                 masterPlayerSlice.actions.setMasterMuted.match(action) ||
                 masterPlayerSlice.actions.setMasterState.match(action)) {
                 const result = next(action);
@@ -91,11 +94,18 @@ export const createControlMiddleware = (): Middleware => {
                     service.notifyMasterPlayerChanged(store.getState().masterPlayer.volume, store.getState().masterPlayer.muted)
                 }
                 return result;
-            }
-            if (userSlice.actions.setStarted.match(action)) {
-                if (action.payload.started) {
+            } else if (configurationSlice.actions.setWebsocketConfiguration.match(action)) {
+                const config = action.payload as WebsocketConfig;
+                const url = `ws://${store.getState().configuration.host.address}:${config.port}${config.path}`;
 
-                }
+                store.dispatch({
+                    type: controlSlice.actions.connect.type,
+                    payload: url
+                });
+            } else if (configurationSlice.actions.connect.match(action)) {
+                lock.acquire(controlSlice.actions.connect.type, async () => {
+                    service.disconnect();
+                })
             }
             return next(action);
         }

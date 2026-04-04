@@ -27,7 +27,23 @@
  */
 
 import './index.css';
+import textGif from './assets/gif/text_preload.gif'
+import catGif from './assets/gif/cat_preload.gif'
 
 console.log(
-  '👋 This message is being logged by "renderer.js", included via webpack',
+    '👋 This message is being logged by "renderer.js", included via webpack',
 );
+
+const textPreloadImg = document.getElementById("textPreload") as HTMLImageElement
+if (textPreloadImg) {
+    textPreloadImg.src = textGif
+} else {
+    console.error("Failed to find #textPreload image element");
+}
+
+const catPreloadImg = document.getElementById("catPreload") as HTMLImageElement
+if (catPreloadImg) {
+    catPreloadImg.src = catGif;
+} else {
+    console.error("Failed to find #catPreload image element");
+}

@@ -1,12 +1,31 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <title>Hello World!</title>
 
-  </head>
-  <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
-  </body>
+</head>
+<body>
+<div id="root" class="relative">
+    <div class="flex flex-col h-screen relative overflow-hidden">
+        <div class="flex-1 min-h-0 flex items-center justify-center">
+            <img class=" h-1/2 w-1/2 object-contain" id="catPreload" alt="Cat preloader"/>
+        </div>
+        <div class="flex-1 min-h-0 relative">
+            <div class="absolute h-full w-full top-1/2">
+                <img class="h-full w-full object-contain" id="textPreload" alt="Text preloader"/>
+            </div>
+        </div>
+
+        <div class="-z-1 absolute bottom-0 w-full h-1/2 flex justify-center items-center -translate-x-1/4">
+            <svg viewBox="0 0 1840 788" fill="none" xmlns="http://www.w3.org/2000/svg"
+                 class="w-[150%] h-full absolute inset-0 " preserveAspectRatio="none">
+                <path
+                        d="M1839.5 787.5H0L181.5 592.5L64 476L208 413.5L213.5 318H328.5V242L482 303L643 242L917.75 0L1192.5 242L1354.5 303L1512.5 242V318L1629 326.5V418L1764.5 476L1659.5 592.5L1839.5 787.5Z"
+                        fill="var(--color-shadow)"/>
+            </svg>
+        </div>
+    </div>
+</div>
+</body>
 </html>

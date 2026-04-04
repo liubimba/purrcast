@@ -14,6 +14,7 @@ type ServerProps = {
 
 type SnapserverProps = {
     path: string,
+    config: string
 }
 
 type SnapclientProps = {
@@ -24,11 +25,16 @@ type LauncherProps = {
     path: string,
 }
 
+type MonitorProps = {
+    port: number
+}
+
 type Props = {
     server: ServerProps;
     launcher: LauncherProps;
     snapserver: SnapserverProps;
     snapclient: SnapclientProps;
+    monitor: MonitorProps;
 }
 
 class Port {
@@ -149,11 +155,15 @@ export class Launcher extends EventEmitter implements Launcher {
                 path: path.join(artifacts, "launcher-cpp", "bin", "snapclient")
             },
             snapserver: {
-                path: path.join(artifacts, "launcher-cpp", "bin", "snapserver")
+                path: path.join(artifacts, "launcher-cpp", "bin", "snapserver"),
+                config: path.join(artifacts, "config", "snapserver.conf")
             },
             launcher: {
                 path: path.join(artifacts, "launcher-cpp", "bin", "multiroom")
             },
+            monitor: {
+                port: await this._portManager.allocate(),
+            }
         })
     }
 
@@ -171,8 +181,12 @@ export class Launcher extends EventEmitter implements Launcher {
                 path: path.join(process.resourcesPath, "bin", "snapclient")
             },
             snapserver: {
-                path: path.join(process.resourcesPath, "bin", "snapserver")
+                path: path.join(process.resourcesPath, "bin", "snapserver"),
+                config: path.join(process.resourcesPath, "config", "snapserver.conf")
             },
+            monitor: {
+                port: await this._portManager.allocate(),
+            }
         })
     }
 
@@ -181,12 +195,15 @@ export class Launcher extends EventEmitter implements Launcher {
         const snapserverProps: SnapserverProps = props.snapserver;
         const snapclientProps: SnapclientProps = props.snapclient;
         const serverProps: ServerProps = props.server;
+        const monitorProps: MonitorProps = props.monitor;
         this._process = spawn(launcherProps.path, [
             "--server.path", serverProps.path,
             "--server.port", serverProps.port.toString(),
             "--server.static_dir", serverProps.static,
             "--snapserver.path", snapserverProps.path,
+            "--snapserver.config", snapserverProps.config,
             "--snapclient.path", snapclientProps.path,
+            "--monitor.port", monitorProps.port.toString(),
         ], {
             cwd: path.dirname(launcherProps.path),
         })

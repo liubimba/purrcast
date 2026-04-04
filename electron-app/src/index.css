@@ -1,8 +1,13 @@
-body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-    sans-serif;
-  margin: auto;
-  max-width: 38rem;
-  padding: 2rem;
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #F5EDE7;
+    --color-shadow: #000000;
 }
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-primary);
+}
+
