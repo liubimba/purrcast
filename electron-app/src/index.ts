@@ -1,6 +1,15 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, Menu} from 'electron';
 import log from 'electron-log/main'
 import {Launcher} from "./launcher";
+import * as path from "node:path";
+
+function getIconPath() {
+    if (app.isPackaged) {
+        return path.join(process.resourcesPath, "icons", "icon.png");
+    }
+
+    return path.join(__dirname, "../../resources/icons/icon.png");
+}
 
 // Initialize logger
 log.initialize();
@@ -23,9 +32,14 @@ const createWindow = (): void => {
     const mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
+        icon: getIconPath(),
         webPreferences: {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         },
+    });
+
+    mainWindow.on("page-title-updated", (event) => {
+        event.preventDefault();
     });
 
     // and load the index.html of the app.
@@ -40,19 +54,32 @@ app.whenReady().then(async () => {
     const mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
+        icon: getIconPath(),
+        title: "Multiroom",
+        titleBarOverlay: {
+            color: "#fff",
+        },
         webPreferences: {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         },
     });
 
+    Menu.setApplicationMenu(null);
+    app.setName("Multiroom");
+    mainWindow.setIcon(getIconPath());
     // and load the index.html of the app.
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+    mainWindow.on("page-title-updated", (event) => {
+        event.preventDefault();
+    });
     await launcher.start();
     launcher.on('ready', (port: number): void => {
         const url = `http://localhost:${port}/?electron=true`;
         log.info("Loading url: ", url)
         mainWindow.loadURL(url);
+        mainWindow.setTitle("Multiroom");
+        mainWindow.setIcon(getIconPath());
     })
 })
 // Quit when all windows are closed, except on macOS. There, it's common
