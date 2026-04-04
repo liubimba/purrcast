@@ -139,7 +139,25 @@ export class Launcher extends EventEmitter implements Launcher {
     }
 
     public async stop() {
-        this._process?.kill();
+        if (!this._process) {
+            return;
+        }
+        return new Promise((resolve) => {
+            this._process.once('exit', () => {
+                resolve(true);
+            });
+            const timeout = setTimeout(() => {
+                log.warn("Process did not exit gracefully, forcing kill");
+                this._process?.kill("SIGKILL");
+                resolve(true);
+            }, 5000);
+            this._process.once('exit', () => {
+                clearTimeout(timeout);
+                resolve(true);
+            });
+
+            this._process.kill('SIGTERM');
+        })
     }
 
     private async startDev_() {

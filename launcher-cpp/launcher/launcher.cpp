@@ -31,7 +31,7 @@ void launcher::launch(const settings& params)
 
 void launcher::shutdown()
 {
-    spdlog::info("Shutdown");
+    spdlog::info("App caught signal to shutdown");
     condition_.notify_all();
 }
 
