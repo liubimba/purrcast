@@ -43,6 +43,11 @@ class module_status
     }
 
 public:
+    bool is_processed()
+    {
+        return state_ == "failed" || state_ == "loaded" || state_ == "established" || state_ == "unloaded" || state_ == "initialized" || state_ == "running" || state_ == "pending";
+    }
+
     explicit module_status(std::string state, std::string message): module_status(std::move(state), std::move(message), current_time_())
     {
     }

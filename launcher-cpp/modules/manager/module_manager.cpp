@@ -17,19 +17,19 @@ void module_manager::add(const module_session& session)
 {
     const module_description& description = module_cast(session.params);
     sessions_.insert({description.module_name, session});
-    logger_->info("Insert new module session: {}", description.module_name);
+    logger_->info("[+] Registered module: '{}'", description.module_name);
 }
 
 void module_manager::startup(const settings::s_manager& params)
 {
-    logger_->info("Startup");
+    logger_->info("Starting up...");
     running_.store(true);
     thread_ = boost::thread{&module_manager::run_, this, params};
 }
 
 void module_manager::shutdown()
 {
-    logger_->info("Shutdown");
+    logger_->info("Shutting down...");
     running_.store(false);
     condition_.notify_all();
     if (thread_.joinable()) thread_.join();
@@ -52,7 +52,7 @@ std::vector<module_session> module_manager::get_sessions() const
 
 void module_manager::run_(const settings::s_manager params)
 {
-    logger_->info("Run");
+    logger_->info("Worker thread started");
     auto last_look_up = boost::chrono::system_clock::now();
     auto interval_look_up = params.interval.unhealthy;
     while (running_.load())
@@ -79,35 +79,69 @@ void module_manager::run_(const settings::s_manager params)
             last_look_up = now;
         }
     }
-    for (const auto& session : sessions_)
+
+    logger_->info("Unloading all modules...");
+    int sleep_time = 200;
+    while (true)
     {
-        auto module = session.second.module;
-        if (module->loaded())
+        bool unloaded_all_modules = true;
+
+        for (const auto& session : sessions_)
         {
-            try
+            i_module* module = session.second.module;
+            module_status last_status = module->get_last_status();
+            if (!last_status.is_processed())
             {
-                module->unload();
+                logger_->warn("Module '{}' is still {} -- {}, waiting...", module->name(), last_status.get_state(), last_status.get_message());
+                unloaded_all_modules = false;
+                continue;
             }
-            catch (std::exception& e)
+            if (module->loaded())
             {
+                try
+                {
+                    logger_->info("Unloading module: {}", module->name());
+                    bool unloaded = module->unload();
+                    if (unloaded)
+                        logger_->info("[-] Unloaded module: '{}'", module->name());
+                    else
+                        logger_->error("[-] Failed to unload module: '{}'", module->name());
+                }
+                catch (std::exception& e)
+                {
+                    logger_->error("[-] Exception while unloading '{}': {}", module->name(), e.what());
+                }
             }
         }
+
+        if (unloaded_all_modules)
+        {
+            logger_->info("All modules unloaded. Worker thread stopped");
+            break;
+        }
+        logger_->info("Sleep for {} milliseconds before next cleanup...", sleep_time);
+        boost::this_thread::sleep_for(boost::chrono::milliseconds(sleep_time));
     }
 }
 
 bool module_manager::look_up_()
 {
-    logger_->debug("Look up");
+    logger_->debug("--- Look up ---");
     std::unordered_set<std::string> unhealthy_modules;
     for (auto& [moduleName, session] : sessions_)
     {
+        if (!running_.load())
+        {
+            logger_->warn("Module manager has been stopped during look up modules"
+                ".");
+            break;
+        }
         const module_description& description = module_cast(session.params);
         if (session.checker->check() == health_status::healthy)
         {
             if (!ready_by_dependency(session))
             {
-                logger_->info("Module {} is loaded, but it`s dependent module are not healthy. Unload module: {}",
-                              description.module_name, description.module_name);
+                logger_->warn("'{}' is healthy but depends on unhealthy modules — unloading", description.module_name);
                 session.module->unload();
             }
             else
@@ -116,6 +150,7 @@ bool module_manager::look_up_()
                 if (try_reload_(session))
                 {
                     session.params = session.module->get_params();
+                    logger_->info("'{}' reloaded with new params", description.module_name);
                     continue;
                 }
             }
@@ -130,17 +165,16 @@ bool module_manager::look_up_()
         }
         if (session.checker->check() == health_status::unhealthy)
         {
-            logger_->error("Module is unhealthy: {}", moduleName);
+            logger_->error("'{}' is unhealthy", moduleName);
             unhealthy_modules.insert(moduleName);
             continue;
         }
         extra_(session);
     }
     if (unhealthy_modules.empty())
-        logger_->info("All modules are loaded and works correctly. Next look up in 5 seconds");
+        logger_->info("All modules healthy");
     else
-        logger_->error("Unhealthy modules: [{}]. Next look up in 500 milliseconds",
-                       absl::StrJoin(unhealthy_modules, ", "));
+        logger_->error("Unhealthy: [{}]", absl::StrJoin(unhealthy_modules, ", "));
     return unhealthy_modules.empty();
 }
 
@@ -192,7 +226,7 @@ bool module_manager::try_load_(const module_session& session)
     }
     if (!unhealthy_dependent_modules.empty())
     {
-        logger_->error("Module {} is not ready to load, since dependent module(s) unhealthy: [{}]",
+        logger_->error("Cannot load '{}': dependencies not ready: [{}]",
                        description.module_name, absl::StrJoin(unhealthy_dependent_modules, ", "));
         return false;
     }
@@ -200,17 +234,18 @@ bool module_manager::try_load_(const module_session& session)
     std::vector<std::string> unhealthy_dependent_modules_by_order = get_unhealthy_dependent_modules_by_order(session);
     if (!unhealthy_dependent_modules.empty())
     {
-        logger_->error("Module {} is not ready to load, since dependent module(s) by order unhealthy: [{}]",
+        logger_->error("Cannot load '{}': load-order dependencies not ready: [{}]",
                        description.module_name, absl::StrJoin(unhealthy_dependent_modules_by_order, ", "));
         return false;
     }
 
     if (!session.module->load(session.params))
     {
-        logger_->error("Failed to load module: {}", description.module_name);
+        logger_->error("Load failed: '{}'", description.module_name);
         return false;
     }
 
+    logger_->info("[+] Loaded module: '{}'", description.module_name);
     return true;
 }
 
