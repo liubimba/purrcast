@@ -1,176 +1,92 @@
 ![preview image](docs/preview.png)
 
-# MULTIROOM
+## Multiroom
 
 ![platform](https://img.shields.io/badge/platform-Ubuntu-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
-**MULTIROOM** --- Десктоп приложение, которое превращает любое
-устройство в вашей локальной сети в синхронизированную колонку через
-браузер.
+**Multiroom** — a desktop app that turns any device on your local network into a synchronized speaker, right from the browser. 🎶
 
-Приложение захватывает системный звук, распространяет его по сети и
-синхронно воспроизводит на всех подключённых устройствах.
+It captures system audio, streams it across the network, and plays it in sync on every connected device — including the one running the app.
 
-------------------------------------------------------------------------
+---
 
-# Table of Contents
+## 📰 Table of Contents
 
--   [Overview](#overview)
--   [Features](#features)
--   [Quick Start](#quick-start)
--   [Installation](#installation)
--   [Usage](#usage)
--   [Development](#development)
--   [Roadmap](#roadmap)
--   [Contributing](#contributing)
--   [License](#license)
+- [Overview](#overview)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Development](#development)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
-------------------------------------------------------------------------
+---
 
-# Overview
+## ✨ Overview
 
-`MULTIROOM` позволяет:
+`Multiroom` lets you:
 
--   захватывать системный звук
--   синхронно передавать его на другие устройства
--   управлять громкостью каждого клиента
--   управлять общей громкостью системы
--   мониторить состояние сервисов
+- 📢 Capture system audio
+- 🛜 Stream it to other devices in real time
+- 🎛️ Control the volume of each client individually
+- 🎚️ Adjust master volume for the whole system
+- ✔️ Monitor the status of all services
 
-Любое устройство с браузером в локальной сети может стать колонкой.
+Any device with a browser on your local network can become a speaker. No installs needed on the client side.
 
-------------------------------------------------------------------------
+---
 
-# Features
+## 📚 Features
 
--   синхронизированный multiroom звук
--   web UI для управления
--   индивидуальная громкость клиента
--   master громкость
--   mute / unmute
--   мониторинг сервисов
--   автоматический запуск сервисов
+- 🔊 Synchronized multiroom audio
+- 🌐 Web UI for easy control
+- 🎛️ Per-client volume control
+- 🎚️ Master volume
+- 🔇 Mute / unmute
+- 📡 Service health monitoring
+- ⚙️ Auto-start for all services
 
-------------------------------------------------------------------------
+---
 
-# Quick Start
+## 🖥️ Quick Start
 
-1.  Установите приложение.
-2.  Запустите **multiroom**.
-3.  Откроется панель управления.
+1. ⬇️ Install the app — [![Latest Release](https://img.shields.io/github/v/release/pauldekarin/multiroom)](https://github.com/pauldekarin/multiroom/releases)
+2. 🚀 Launch **Multiroom**
+3. 🖵 The control panel will open automatically
 
-Другие устройства могут подключиться через браузер:
+Other devices can connect via browser:
 
-http://`<host-ip>`:3000
-
-Все подключённые устройства будут воспроизводить звук синхронно.
-
-------------------------------------------------------------------------
-
-# Installation
-
-Пока поддерживается только **Ubuntu**.
-
-Установите зависимости:
-
-``` bash
-sudo apt-get update -qq
-
-sudo apt-get install -y \
-  libboost-all-dev \
-  libpulse-dev \
-  libasound2-dev \
-  pkg-config \
-  libavahi-client-dev \
-  libflac-dev \
-  libogg-dev \
-  libvorbis-dev \
-  libopus-dev
+```
+http://<host-ip>:<port>
 ```
 
-Установите приложение через **Electron installer**.
+---
 
-------------------------------------------------------------------------
+## 🌍 Roadmap
 
-# Usage
+Coming soon:
 
-После запуска приложения:
+- 🍎 macOS support
+- 🪟 Windows support
 
-1.  Electron запускает backend сервис.
-2.  Открывается Web UI.
-3.  Система начинает захват аудио.
+---
 
-В интерфейсе доступны:
+## 🤝 Contributing
 
-### Client Controls
+Pull requests are welcome! 🙌
 
--   громкость клиента
--   mute / unmute
--   имя устройства
+To contribute:
 
-### Master Controls
+1. Fork the repo
+2. Create a feature branch
+3. Make your changes
+4. Open a Pull Request
 
--   master volume
--   mute / unmute всех клиентов
+---
 
-### Monitoring
+## 📄 License
 
-отображается состояние:
-
--   snapserver
--   snapclient
--   loopback
--   routing
-
-# Development
-
-### Build backend
-
-``` bash
-go build
-```
-
-### Build C++ launcher
-
-``` bash
-cmake .
-make
-```
-
-### Run frontend
-
-``` bash
-npm install
-npm run dev
-```
-
-------------------------------------------------------------------------
-
-# Roadmap
-
-Планируемые улучшения:
-
--   macOS support
--   Windows support
--   улучшенная диагностика
--   расширенный мониторинг
-
-------------------------------------------------------------------------
-
-# Contributing
-
-Pull requests приветствуются.
-
-Если вы хотите внести вклад:
-
-1.  Fork репозитория
-2.  Создайте feature branch
-3.  Сделайте изменения
-4.  Откройте Pull Request
-
-------------------------------------------------------------------------
-
-# License
-
-Проект распространяется под лицензией MIT.
+MIT — see [LICENSE](LICENSE).
