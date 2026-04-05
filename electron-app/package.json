@@ -1,7 +1,7 @@
 {
   "name": "Multiroom",
   "productName": "Multiroom",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "description": "Turns any device on your local network into a synchronized speaker",
   "main": ".webpack/main",
   "scripts": {

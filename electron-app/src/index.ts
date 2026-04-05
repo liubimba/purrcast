@@ -18,39 +18,9 @@ log.initialize();
 // plugin that tells the Electron app where to look for the Webpack-bundled app code (depending on
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-    app.quit();
-}
-
 const launcher = new Launcher(!app.isPackaged);
 
-const createWindow = (): void => {
-    // Create the browser window.
-    const mainWindow = new BrowserWindow({
-        height: 600,
-        width: 800,
-        icon: getIconPath(),
-        webPreferences: {
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        },
-    });
-
-    mainWindow.on("page-title-updated", (event) => {
-        event.preventDefault();
-    });
-
-    // and load the index.html of the app.
-    mainWindow.loadURL('http://127.0.0.1:8080');
-
-};
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
+const createWindow = async () => {
     const mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
@@ -58,21 +28,17 @@ app.whenReady().then(async () => {
         title: "Multiroom",
         titleBarOverlay: {
             color: "#fff",
-        },
-        webPreferences: {
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
-        },
+        }
     });
 
     Menu.setApplicationMenu(null);
-    app.setName("Multiroom");
     mainWindow.setIcon(getIconPath());
-    // and load the index.html of the app.
     mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
     mainWindow.on("page-title-updated", (event) => {
         event.preventDefault();
     });
+
     await launcher.start();
     launcher.on('ready', (port: number): void => {
         const url = `http://localhost:${port}/?electron=true`;
@@ -81,6 +47,13 @@ app.whenReady().then(async () => {
         mainWindow.setTitle("Multiroom");
         mainWindow.setIcon(getIconPath());
     })
+};
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.whenReady().then(async () => {
+    createWindow();
 })
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -107,3 +80,9 @@ app.on('before-quit', (event) => {
         app.exit(0);
     })
 })
+
+
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require('electron-squirrel-startup')) {
+    app.quit();
+}
