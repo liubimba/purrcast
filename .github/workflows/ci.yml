@@ -188,6 +188,9 @@ jobs:
           merge-multiple: true
           path: artifacts/
 
+      - name: Fix binary permissions
+        run: chmod +x artifacts/launcher-cpp/bin/* artifacts/backend-go/backend-go
+
       - name: Install Electron app dependencies
         run: cd electron-app && npm ci
 
