@@ -1,0 +1,4 @@
+# Third-party sources checked in under launcher-cpp/libs (abseil-cpp, json, portaudio,
+# pulseaudio, snapcast, spdlog). They are built from source, so they live in the tree, but
+# they are not this project's code and should not be counted as it.
+launcher-cpp/libs/** linguist-vendored
