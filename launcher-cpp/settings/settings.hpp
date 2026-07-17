@@ -185,7 +185,6 @@ struct settings
                 }
             };
 
-            /** Where to also write the captured audio, for debugging. Empty means do not record. */
             std::string record_path;
 
             s_router(): s_router({}, {})
