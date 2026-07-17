@@ -3,7 +3,7 @@
 ## Multiroom
 
 ![platform](https://img.shields.io/badge/platform-Ubuntu-blue)
-![license](https://img.shields.io/badge/license-MIT-green)
+![license](https://img.shields.io/badge/license-GPL--3.0-green)
 
 **Multiroom** — a desktop app that turns any device on your local network into a synchronized speaker, right from the browser. 🎶
 
@@ -89,4 +89,8 @@ To contribute:
 
 ## 📄 License
 
-MIT — see [LICENSE](LICENSE).
+GPL-3.0-or-later — see [LICENSE](LICENSE).
+
+The browser client is built on [Snapweb](https://github.com/badaix/snapweb), and the audio
+transport on [Snapcast](https://github.com/badaix/snapcast) — both GPL-3.0 by Johannes Pohl.
+`snapstream.ts` and `snapcontrol.ts` are derived from Snapweb and carry its licence.
