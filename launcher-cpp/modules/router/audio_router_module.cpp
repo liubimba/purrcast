@@ -77,11 +77,11 @@ bool audio_router_module::load(const module_params& moduleParams)
         return false;
     }
     set_last_status_(router_module_status::started_sink_stream());
-    if (params.record_source)
+    if (!params.record_path.empty())
     {
         std::unique_ptr<i_audio_sink_stream> file_stream = std::make_unique<file_audio_sink_stream>(services_, "router");
         audio_stream_params file_parameters;
-        file_parameters.name = "/home/bimba/Projects/multiroom/artifacts/record.pcm";
+        file_parameters.name = params.record_path;
         result = file_stream->start(file_parameters);
         if (result.is_ok)
         {

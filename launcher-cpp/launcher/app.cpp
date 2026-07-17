@@ -36,6 +36,9 @@ int main(int argc, char** argv)
       parser.add_argument("--monitor.interval")
             .help("Interval between monitoring in milliseconds")
             .default_value("1000");
+      parser.add_argument("--router.record")
+            .help("Write the captured audio to this file as well, for debugging. Off by default")
+            .default_value("");
       parser.add_argument("--test.snapclient.path")
             .help("Path to test snapclient binary file")
             .default_value("--snapclient.path");
@@ -65,6 +68,8 @@ int main(int argc, char** argv)
             settings.module.server.port = std::atoi(parser.get<std::string>("--server.port").c_str());
             settings.module.server.static_dir = parser.get<std::string>("--server.static_dir");
             settings.module.server.extra_args = absl::StrFormat("--monitor.port %d", settings.module.monitor.port);
+
+            settings.module.router.record_path = parser.get<std::string>("--router.record");
 
             settings.module.test_environment.enabled = parser.get<std::string>("--test.enabled") == "true";
             settings.module.test_environment.loopback.module_name = "test_environment_loopback";

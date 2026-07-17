@@ -185,7 +185,8 @@ struct settings
                 }
             };
 
-            bool record_source = true;
+            /** Where to also write the captured audio, for debugging. Empty means do not record. */
+            std::string record_path;
 
             s_router(): s_router({}, {})
             {
@@ -213,6 +214,7 @@ struct settings
                 nlohmann::json j = module_description::to_json();
                 j["source"] = source.to_json();
                 j["sink"] = sink.to_json();
+                j["recordPath"] = record_path;
                 return j.dump();
             }
         };
