@@ -23,8 +23,9 @@ stack from one desktop icon. The thing you tell a guest is "open purrcast.local"
 
 ## What you get
 
-- **Any browser is a speaker.** FLAC, Opus and PCM are decoded in the page; output latency is
-  measured and compensated so devices stay in step rather than merely close.
+- **Any browser is a speaker.** FLAC, Opus and PCM are decoded in the page, and playback is
+  scheduled against the browser's own reported audio latency, so devices land in step rather than
+  merely close.
 - **A volume knob per speaker**, from any device — the kitchen can be quieter than the study.
 - **Controls on your phone's lock screen.** Track, artist and artwork land in the system media
   controls through the MediaSession API.
@@ -75,9 +76,9 @@ The Go server is deliberately thin: it serves the built web app, answers `/api/c
 ports the browser needs, relays state between open tabs, and registers the mDNS name.
 
 The browser does the interesting part. `snapstream.ts` speaks Snapcast's stream protocol, decodes
-FLAC/Opus/PCM, and schedules playback against `AudioContext.outputLatency` so what you hear lines
-up with the other speakers. A browser on the host itself only sends commands — the native
-snapclient is already playing there.
+FLAC/Opus/PCM, and schedules each buffer against the server's clock plus the `AudioContext`'s own
+base and output latency, so what you hear lines up with the other speakers. A browser on the host
+itself only sends commands — the native snapclient is already playing there.
 
 | | |
 |---|---|
