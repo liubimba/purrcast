@@ -7,7 +7,7 @@ import (
 	"github.com/grandcat/zeroconf"
 )
 
-func RegisterMDNS(iface net.Interface, ip net.IP, httpPort int) {
+func RegisterMDNS(iface net.Interface, ip net.IP, httpPort int) (*zeroconf.Server, error) {
 	server, err := zeroconf.RegisterProxy(
 		"multiroom",
 		"_http._tcp",
@@ -19,8 +19,8 @@ func RegisterMDNS(iface net.Interface, ip net.IP, httpPort int) {
 		[]net.Interface{iface},
 	)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer server.Shutdown()
 	log.Printf("mDNS service running: multiroom.local:%d", httpPort)
+	return server, nil
 }

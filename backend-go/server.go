@@ -33,6 +33,12 @@ func main() {
 
 	host := "multiroom"
 	iface, ip := utility.GetExternalInterface()
-	mdns.RegisterMDNS(iface, ip, *httpPort)
+	if ip == nil {
+		log.Print("No external network interface; clients on other devices will not reach this host")
+	} else if server, err := mdns.RegisterMDNS(iface, ip, *httpPort); err != nil {
+		log.Printf("mDNS registration failed, clients will need the address: %v", err)
+	} else {
+		defer server.Shutdown()
+	}
 	http.StartHTTPServer(*httpPort, *monitorPort, host, ip.String(), absStaticDir)
 }
