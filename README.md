@@ -30,7 +30,8 @@ stack from one desktop icon. The thing you tell a guest is "open purrcast.local"
   controls through the MediaSession API.
 - **It finds itself.** The host announces `purrcast.local` over mDNS.
 - **Nothing to configure.** Ports are taken from the 5000–9000 range at startup, whatever is free.
-- **You can see what is wrong.** Every subsystem reports its own health to the UI, live.
+- **You can see what is wrong.** Every subsystem reports its own health to the UI, live, and one
+  that has fallen over is started again.
 
 ## Install
 
@@ -66,8 +67,9 @@ written against Linux, and there is no port in progress.
 A C++ launcher owns the audio path and the processes: it creates a PulseAudio null-sink and makes
 it the default output, so everything the system plays lands there; reads that sink's monitor
 through PortAudio and writes it into snapserver's FIFO; then starts snapserver, a local snapclient
-so the host plays too, the Go server, and a monitor. Each module declares what it depends on, is
-health-checked, and is restarted when it stops answering.
+so the host plays too, the Go server, and a monitor. Each module declares what it depends on and
+is polled on a loop: one that has stopped is started again, one whose dependency is sick is taken
+down with it, and one that is running but failing its check is reported rather than bounced.
 
 The Go server is deliberately thin: it serves the built web app, answers `/api/config` with the
 ports the browser needs, relays state between open tabs, and registers the mDNS name.
