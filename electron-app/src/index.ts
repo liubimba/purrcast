@@ -25,7 +25,7 @@ const createWindow = async () => {
         height: 600,
         width: 800,
         icon: getIconPath(),
-        title: "Multiroom",
+        title: "Purrcast",
         titleBarOverlay: {
             color: "#fff",
         }
@@ -44,7 +44,7 @@ const createWindow = async () => {
         const url = `http://localhost:${port}/?electron=true`;
         log.info("Loading url: ", url)
         mainWindow.loadURL(url);
-        mainWindow.setTitle("Multiroom");
+        mainWindow.setTitle("Purrcast");
         mainWindow.setIcon(getIconPath());
     })
 };

@@ -1,4 +1,4 @@
-module multiroom/backend-go
+module purrcast/backend-go
 
 go 1.22.2
 

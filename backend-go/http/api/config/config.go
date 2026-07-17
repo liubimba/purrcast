@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"multiroom/backend-go/hub"
 	"net/http"
+	"purrcast/backend-go/hub"
 )
 
 func ConfigHandler(configuration hub.Configuration) http.HandlerFunc {

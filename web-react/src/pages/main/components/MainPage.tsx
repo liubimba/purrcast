@@ -45,8 +45,8 @@ export const MainPage: React.FC = () => {
     const navigate = useNavigateWithQuery();
 
 
-    const [page, setPage] = useState("multiroom");
-    const paginator = useRef<Paginator>(new Paginator("multiroom", ["multiroom", "about"]));
+    const [page, setPage] = useState("purrcast");
+    const paginator = useRef<Paginator>(new Paginator("purrcast", ["purrcast", "about"]));
 
     const handleNavigate = (p: string): void => {
         paginator.current.setPage(p);
@@ -75,7 +75,7 @@ export const MainPage: React.FC = () => {
             }}
 
             content={
-                page == "multiroom" ? {
+                page == "purrcast" ? {
                     node: <Controls/>,
                     title: "CONTROLS"
                 } : page === "about" ? {

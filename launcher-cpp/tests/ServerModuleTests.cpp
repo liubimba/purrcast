@@ -10,7 +10,7 @@
 class ServerModule : public needs_external_binary
 {
 protected:
-    ServerModule(): needs_external_binary("MULTIROOM_SERVER_BINARY")
+    ServerModule(): needs_external_binary("PURRCAST_SERVER_BINARY")
     {
     }
 
@@ -36,12 +36,13 @@ protected:
         return params(port_);
     }
 
-    static bool server_process_running()
+    bool server_process_running() const
     {
+        const std::string name = std::filesystem::path(binary_).filename().string();
         std::vector<ProcessInfoDescription> processes = process_info::list();
-        return std::any_of(processes.begin(), processes.end(), [](const ProcessInfoDescription& desc)
+        return std::any_of(processes.begin(), processes.end(), [&name](const ProcessInfoDescription& desc)
         {
-            return desc.cmd == "server";
+            return desc.cmd == name;
         });
     }
 

@@ -2,9 +2,9 @@ package config
 
 import (
 	"encoding/json"
-	"multiroom/backend-go/hub"
 	"net/http"
 	"net/http/httptest"
+	"purrcast/backend-go/hub"
 	"testing"
 )
 
@@ -14,7 +14,7 @@ func configuration() hub.Configuration {
 		Snapserver: hub.SnapserverConfig{Ports: hub.SnapserverPorts{Http: 1780, Stream: 1704, Control: 1705}},
 		Websocket:  hub.WebsocketConfig{Path: "/ws", Port: 5000},
 		Monitor:    hub.MonitorConfig{Port: 5001},
-		Host:       hub.HostConfig{Hostname: "multiroom", Address: "192.168.0.10", Port: 5000},
+		Host:       hub.HostConfig{Hostname: "purrcast", Address: "192.168.0.10", Port: 5000},
 	}
 }
 

@@ -10,7 +10,7 @@
 class SnapclientModule : public needs_external_binary
 {
 protected:
-    SnapclientModule(): needs_external_binary("MULTIROOM_SNAPCLIENT_BINARY")
+    SnapclientModule(): needs_external_binary("PURRCAST_SNAPCLIENT_BINARY")
     {
     }
 

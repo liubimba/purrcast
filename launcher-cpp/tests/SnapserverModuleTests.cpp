@@ -8,7 +8,7 @@
 class SnapserverModule : public needs_external_binary
 {
 protected:
-    SnapserverModule(): needs_external_binary("MULTIROOM_SNAPSERVER_BINARY")
+    SnapserverModule(): needs_external_binary("PURRCAST_SNAPSERVER_BINARY")
     {
     }
 
@@ -16,7 +16,7 @@ protected:
     {
         settings::s_module::s_snapserver params;
         params.path_to_binary = binary_;
-        params.config = TestData::from_environment("MULTIROOM_SNAPSERVER_CONFIG");
+        params.config = TestData::from_environment("PURRCAST_SNAPSERVER_CONFIG");
         return params;
     }
 

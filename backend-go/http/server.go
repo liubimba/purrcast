@@ -3,10 +3,10 @@ package http
 import (
 	"fmt"
 	"log"
-	"multiroom/backend-go/http/api/config"
-	"multiroom/backend-go/http/websocket"
-	"multiroom/backend-go/hub"
 	"net/http"
+	"purrcast/backend-go/http/api/config"
+	"purrcast/backend-go/http/websocket"
+	"purrcast/backend-go/hub"
 )
 
 func StartHTTPServer(httpPort int, monitorPort int, host string, externalAddress string, staticDir string) {

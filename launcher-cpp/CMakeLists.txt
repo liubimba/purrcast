@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(multiroom VERSION 0.34.0)
+project(purrcast VERSION 0.34.0)
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -52,9 +52,9 @@ option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 option(ENABLE_DEBUG_FLAGS "Enable debug flags and optimizations" OFF)
-option(BUILD_MULTIROOM_TESTS "Build and run multiroom tests" OFF)
+option(BUILD_PURRCAST_TESTS "Build and run purrcast tests" OFF)
 
-add_executable(multiroom
+add_executable(purrcast
         launcher/launcher.cpp
         launcher/app.cpp
 
@@ -97,7 +97,7 @@ set_target_properties(common PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 )
 
-add_dependencies(multiroom snapserver snapclient)
+add_dependencies(purrcast snapserver snapclient)
 
 target_include_directories(common PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/snapcast)
@@ -105,11 +105,11 @@ target_include_directories(snapserver PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/snapcast/server/
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/snapcast)
 
-target_include_directories(multiroom PUBLIC
+target_include_directories(purrcast PUBLIC
         ${PULSEAUDIO_INCLUDE_DIRS}
 )
 
-target_link_libraries(multiroom PUBLIC
+target_link_libraries(purrcast PUBLIC
         ${PULSEAUDIO_LIBRARIES}
         nlohmann_json::nlohmann_json
         yaml-cpp::yaml-cpp
@@ -125,7 +125,7 @@ target_link_libraries(multiroom PUBLIC
 )
 
 if (ENABLE_DEBUG_FLAGS)
-    target_compile_options(multiroom PRIVATE
+    target_compile_options(purrcast PRIVATE
             -g -O0 -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor
             -Wcast-align -Wunused -Woverloaded-virtual -Wconversion
             -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2
@@ -133,21 +133,21 @@ if (ENABLE_DEBUG_FLAGS)
 endif ()
 
 if (ENABLE_ASAN)
-    target_compile_options(multiroom PRIVATE -fsanitize=address -fno-omit-frame-pointer)
-    target_link_libraries(multiroom PRIVATE -fsanitize=address asan)
+    target_compile_options(purrcast PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+    target_link_libraries(purrcast PRIVATE -fsanitize=address asan)
 endif ()
 
 if (ENABLE_UBSAN)
-    target_compile_options(multiroom PRIVATE -fsanitize=undefined)
-    target_link_libraries(multiroom PRIVATE -fsanitize=undefined)
+    target_compile_options(purrcast PRIVATE -fsanitize=undefined)
+    target_link_libraries(purrcast PRIVATE -fsanitize=undefined)
 endif ()
 
 if (ENABLE_TSAN AND NOT ENABLE_ASAN)
-    target_compile_options(multiroom PRIVATE -fsanitize=thread)
-    target_link_libraries(multiroom PRIVATE -fsanitize=thread)
+    target_compile_options(purrcast PRIVATE -fsanitize=thread)
+    target_link_libraries(purrcast PRIVATE -fsanitize=thread)
 endif ()
 
-if (BUILD_MULTIROOM_TESTS)
+if (BUILD_PURRCAST_TESTS)
     include(FetchContent)
     set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
@@ -160,7 +160,7 @@ if (BUILD_MULTIROOM_TESTS)
 
     enable_testing()
 
-    add_executable(multiroom_tests
+    add_executable(purrcast_tests
             tests/ServicesTests.cpp
             tests/SettingsTests.cpp
             tests/LoggerFactoryTests.cpp
@@ -205,7 +205,7 @@ if (BUILD_MULTIROOM_TESTS)
             modules/test_environment/listener/proxy_audio_sink_listener.cpp
     )
 
-    target_link_libraries(multiroom_tests PUBLIC
+    target_link_libraries(purrcast_tests PUBLIC
             nlohmann_json::nlohmann_json
             yaml-cpp::yaml-cpp
             GTest::gtest_main
@@ -223,7 +223,7 @@ if (BUILD_MULTIROOM_TESTS)
             argparse::argparse
     )
 
-    target_include_directories(multiroom_tests PUBLIC
+    target_include_directories(purrcast_tests PUBLIC
             ${PULSEAUDIO_INCLUDE_DIRS}
             portaudio/include
             snapcast/
@@ -235,14 +235,14 @@ if (BUILD_MULTIROOM_TESTS)
             settings/
     )
 
-    add_dependencies(multiroom_tests multiroom)
+    add_dependencies(purrcast_tests purrcast)
 
     include(GoogleTest)
-    gtest_discover_tests(multiroom_tests)
+    gtest_discover_tests(purrcast_tests)
 
     add_custom_target(run_tests
             COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-            DEPENDS multiroom_tests
+            DEPENDS purrcast_tests
     )
 else ()
     message(STATUS "Build tests disabled")

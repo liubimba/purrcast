@@ -1,1 +1,1 @@
-export const APP_NAME: string = "MULTIROOM"
+export const APP_NAME: string = "PURRCAST"

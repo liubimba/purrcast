@@ -2,10 +2,10 @@ package websocket
 
 import (
 	"encoding/json"
-	"multiroom/backend-go/hub"
-	"multiroom/backend-go/message"
-	"multiroom/backend-go/utility"
 	"net/http"
+	"purrcast/backend-go/hub"
+	"purrcast/backend-go/message"
+	"purrcast/backend-go/utility"
 
 	"github.com/gorilla/websocket"
 )

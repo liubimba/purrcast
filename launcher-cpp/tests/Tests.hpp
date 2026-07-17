@@ -112,7 +112,7 @@ private:
     static bool daemon_reachable()
     {
         pa_mainloop* loop = pa_mainloop_new();
-        pa_context* context = pa_context_new(pa_mainloop_get_api(loop), "multiroom-tests");
+        pa_context* context = pa_context_new(pa_mainloop_get_api(loop), "purrcast-tests");
         bool reachable = false;
         if (pa_context_connect(context, nullptr, PA_CONTEXT_NOFLAGS, nullptr) >= 0)
         {

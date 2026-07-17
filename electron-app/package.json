@@ -1,6 +1,6 @@
 {
-  "name": "Multiroom",
-  "productName": "Multiroom",
+  "name": "purrcast",
+  "productName": "Purrcast",
   "version": "0.1.0",
   "description": "Turns any device on your local network into a synchronized speaker",
   "main": ".webpack/main",

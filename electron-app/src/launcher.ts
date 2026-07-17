@@ -177,7 +177,7 @@ export class Launcher extends EventEmitter implements Launcher {
                 config: path.join(artifacts, "config", "snapserver.conf")
             },
             launcher: {
-                path: path.join(artifacts, "launcher-cpp", "bin", "multiroom")
+                path: path.join(artifacts, "launcher-cpp", "bin", "purrcast")
             },
             monitor: {
                 port: await this._portManager.allocate(),
@@ -193,7 +193,7 @@ export class Launcher extends EventEmitter implements Launcher {
                 static: path.join(process.resourcesPath, "static")
             },
             launcher: {
-                path: path.join(process.resourcesPath, "bin", "multiroom")
+                path: path.join(process.resourcesPath, "bin", "purrcast")
             },
             snapclient: {
                 path: path.join(process.resourcesPath, "bin", "snapclient")

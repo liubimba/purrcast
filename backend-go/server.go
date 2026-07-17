@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"log"
-	"multiroom/backend-go/http"
-	"multiroom/backend-go/mdns"
-	"multiroom/backend-go/utility"
 	"os"
 	"path/filepath"
+	"purrcast/backend-go/http"
+	"purrcast/backend-go/mdns"
+	"purrcast/backend-go/utility"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 		log.Fatalf("static_dir is not a directory: %s", absStaticDir)
 	}
 
-	host := "multiroom"
+	host := "purrcast"
 	iface, ip := utility.GetExternalInterface()
 	if ip == nil {
 		log.Print("No external network interface; clients on other devices will not reach this host")

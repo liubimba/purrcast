@@ -9,11 +9,11 @@ import (
 
 func RegisterMDNS(iface net.Interface, ip net.IP, httpPort int) (*zeroconf.Server, error) {
 	server, err := zeroconf.RegisterProxy(
-		"multiroom",
+		"purrcast",
 		"_http._tcp",
 		"local.",
 		httpPort,
-		"multiroom",
+		"purrcast",
 		[]string{ip.String()},
 		nil,
 		[]net.Interface{iface},
@@ -21,6 +21,6 @@ func RegisterMDNS(iface net.Interface, ip net.IP, httpPort int) (*zeroconf.Serve
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("mDNS service running: multiroom.local:%d", httpPort)
+	log.Printf("mDNS service running: purrcast.local:%d", httpPort)
 	return server, nil
 }

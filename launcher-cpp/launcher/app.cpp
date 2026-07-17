@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-      argparse::ArgumentParser parser("multiroom");
+      argparse::ArgumentParser parser("purrcast");
 
       parser.add_argument("--snapserver.path")
             .help("Path to snapserver binary file")
