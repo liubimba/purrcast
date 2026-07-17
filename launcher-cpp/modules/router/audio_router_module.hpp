@@ -91,6 +91,8 @@ public:
     [[nodiscard]] i_audio_source_stream* get_source_stream() const;
 
 private:
+    void create_streams_();
+
     std::vector<i_audio_sink*> sinks_{};
     const services* services_;
     settings::s_module::s_router params_;

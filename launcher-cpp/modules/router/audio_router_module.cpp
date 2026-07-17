@@ -13,14 +13,19 @@
 #include "../../stream/port_audio_source_stream.hpp"
 
 audio_router_module::audio_router_module(const services* services):
-    services_(services),
-    sink_stream_(std::make_unique<fifo_audio_sink_stream>(services, "router")),
-    source_stream_(std::make_unique<port_audio_source_stream>(services, "router"))
+    services_(services)
 {
     if (services)
     {
         if (services->has<logger_factory>()) logger_ = services->get<logger_factory>()->create("AudioRouterModule");
     }
+    create_streams_();
+}
+
+void audio_router_module::create_streams_()
+{
+    sink_stream_ = std::make_unique<fifo_audio_sink_stream>(services_, "router");
+    source_stream_ = std::make_unique<port_audio_source_stream>(services_, "router");
     source_stream_->add_sink(sink_stream_.get());
 }
 
@@ -48,6 +53,8 @@ bool audio_router_module::load(const module_params& moduleParams)
         throw std::runtime_error("Unsupported type of parameters passed to AudioRouterModule::load");
     if (loaded())
         throw std::runtime_error("AudioRouterModule already loaded");
+    if (!source_stream_ || !sink_stream_)
+        create_streams_();
     settings::s_module::s_router params = std::get<settings::s_module::s_router>(moduleParams);
     set_last_status_(router_module_status::loading(params));
     audio_stream_params source_params;
