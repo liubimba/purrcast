@@ -4,53 +4,48 @@
 #include "Tests.hpp"
 #include "../modules/router/audio_router_module.hpp"
 
-TEST(AudioRouterModule, load)
+class AudioRouterModule : public needs_audio_input_device
 {
-    Pa_Initialize();
-    settings::s_module::s_router params{};
-    params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    params.sink.name = "/tmp/fifo";
+protected:
+    settings::s_module::s_router params(const std::string& sink = "/tmp/fifo")
+    {
+        settings::s_module::s_router params{};
+        params.source.name = device_name_;
+        params.sink.name = sink;
+        return params;
+    }
+};
+
+TEST_F(AudioRouterModule, load)
+{
     audio_router_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.load(settings::s_module::s_loopback{}));
-    ASSERT_TRUE(module.load(params));
-    ASSERT_ANY_THROW(module.load(params));
+    ASSERT_TRUE(module.load(params()));
+    ASSERT_ANY_THROW(module.load(params()));
 }
 
-TEST(AudioRouterModule, reload)
+TEST_F(AudioRouterModule, reload)
 {
-    Pa_Initialize();
-    settings::s_module::s_router params{};
-    params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    params.sink.name = "/tmp/fifo";
     audio_router_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.reload(settings::s_module::s_loopback{}));
-    ASSERT_ANY_THROW(module.reload(params));
-    ASSERT_TRUE(module.load(params));
-    ASSERT_FALSE(module.reload(params));
-    params.sink.name = "/tmp/fifo2";
-    ASSERT_TRUE(module.reload(params));
+    ASSERT_ANY_THROW(module.reload(params()));
+    ASSERT_TRUE(module.load(params()));
+    ASSERT_FALSE(module.reload(params()));
+    ASSERT_TRUE(module.reload(params("/tmp/fifo2")));
 }
 
-TEST(AudioRouterModule, unload)
+TEST_F(AudioRouterModule, unload)
 {
-    Pa_Initialize();
-    settings::s_module::s_router params{};
-    params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    params.sink.name = "/tmp/fifo";
     audio_router_module module{TestData::get_services()};
     ASSERT_ANY_THROW(module.unload());
-    ASSERT_TRUE(module.load(params));
+    ASSERT_TRUE(module.load(params()));
     ASSERT_TRUE(module.unload());
 }
 
-TEST(AudioRouterModule, loaded)
+TEST_F(AudioRouterModule, loaded)
 {
-    Pa_Initialize();
-    settings::s_module::s_router params{};
-    params.source.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    params.sink.name = "/tmp/fifo";
     audio_router_module module{TestData::get_services()};
     ASSERT_FALSE(module.loaded());
-    ASSERT_TRUE(module.load(params));
+    ASSERT_TRUE(module.load(params()));
     ASSERT_TRUE(module.loaded());
 }

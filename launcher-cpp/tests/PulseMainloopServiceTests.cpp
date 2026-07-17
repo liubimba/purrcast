@@ -4,7 +4,11 @@
 
 #include "Tests.hpp"
 
-TEST(PulseMainloopService, issue)
+class PulseMainloopService : public needs_pulse_audio
+{
+};
+
+TEST_F(PulseMainloopService, issue)
 {
     pulse::mainloop_service service{TestData::get_services()};
     ASSERT_TRUE(service.available());

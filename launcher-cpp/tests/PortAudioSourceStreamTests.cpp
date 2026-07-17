@@ -4,38 +4,37 @@
 
 #include "Tests.hpp"
 
-TEST(PortAudioSourceStream, start)
+class PortAudioSourceStream : public needs_audio_input_device
 {
-    Pa_Initialize();
-    audio_stream_params params;
+protected:
+    audio_stream_params params()
+    {
+        audio_stream_params params;
+        params.name = device_name_;
+        return params;
+    }
+};
+
+TEST_F(PortAudioSourceStream, start)
+{
     port_audio_source_stream stream{TestData::get_services(), TestData::uuid()};
-    ASSERT_FALSE(stream.start(params).is_ok);
-    params.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
-    ASSERT_TRUE(stream.start(params).is_ok);
-    ASSERT_ANY_THROW(stream.start(params));
-    Pa_Terminate();
+    ASSERT_FALSE(stream.start(audio_stream_params{}).is_ok);
+    ASSERT_TRUE(stream.start(params()).is_ok);
+    ASSERT_ANY_THROW(stream.start(params()));
 }
 
-TEST(PortAudioSourceStream, stop)
+TEST_F(PortAudioSourceStream, stop)
 {
-    Pa_Initialize();
-    audio_stream_params params;
-    params.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
     port_audio_source_stream stream{TestData::get_services(), TestData::uuid()};
     ASSERT_ANY_THROW(stream.stop());
-    ASSERT_TRUE(stream.start(params).is_ok);
+    ASSERT_TRUE(stream.start(params()).is_ok);
     ASSERT_TRUE(stream.stop().is_ok);
-    Pa_Terminate();
 }
 
-TEST(PortAudioSourceStream, started)
+TEST_F(PortAudioSourceStream, started)
 {
-    Pa_Initialize();
-    audio_stream_params params;
-    params.name = Pa_GetDeviceInfo(Pa_GetDefaultInputDevice())->name;
     port_audio_source_stream stream{TestData::get_services(), TestData::uuid()};
     ASSERT_FALSE(stream.started());
-    ASSERT_TRUE(stream.start(params).is_ok);
+    ASSERT_TRUE(stream.start(params()).is_ok);
     ASSERT_TRUE(stream.started());
-    Pa_Terminate();
 }

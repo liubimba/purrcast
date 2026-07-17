@@ -73,6 +73,60 @@ public:
     {
         return std::chrono::seconds(1);
     }
+
+    static std::string from_environment(const char* variable)
+    {
+        const char* value = std::getenv(variable);
+        return value == nullptr ? std::string{} : std::string{value};
+    }
+};
+
+class needs_audio_input_device : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        Pa_Initialize();
+        const PaDeviceIndex device = Pa_GetDefaultInputDevice();
+        if (device == paNoDevice)
+            GTEST_SKIP() << "no audio input device on this machine";
+        const PaDeviceInfo* info = Pa_GetDeviceInfo(device);
+        if (info == nullptr)
+            GTEST_SKIP() << "no audio input device on this machine";
+        device_name_ = info->name;
+    }
+
+    std::string device_name_;
+};
+
+class needs_pulse_audio : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        if (!pulse::mainloop_service{TestData::get_services()}.available())
+            GTEST_SKIP() << "no PulseAudio daemon on this machine";
+    }
+};
+
+class needs_external_binary : public ::testing::Test
+{
+protected:
+    explicit needs_external_binary(const char* variable): variable_(variable)
+    {
+    }
+
+    void SetUp() override
+    {
+        binary_ = TestData::from_environment(variable_);
+        if (binary_.empty())
+            GTEST_SKIP() << "spawns a real process; set " << variable_ << " to its executable to run this";
+    }
+
+    std::string binary_;
+
+private:
+    const char* variable_;
 };
 
 #endif //TESTS_HPP
