@@ -4,7 +4,11 @@
 
 #include "Tests.hpp"
 
-TEST(AudioLoopbackModule, load)
+class AudioLoopbackModule : public needs_pulse_audio
+{
+};
+
+TEST_F(AudioLoopbackModule, load)
 {
     settings::s_module::s_loopback params{};
     audio_loopback_module module{TestData::get_services()};
@@ -14,7 +18,7 @@ TEST(AudioLoopbackModule, load)
 }
 
 
-TEST(AudioLoopbackModule, reload)
+TEST_F(AudioLoopbackModule, reload)
 {
     settings::s_module::s_loopback params{};
     audio_loopback_module module{TestData::get_services()};
@@ -25,7 +29,7 @@ TEST(AudioLoopbackModule, reload)
     ASSERT_TRUE(module.reload(params));
 }
 
-TEST(AudioLoopbackModule, unload)
+TEST_F(AudioLoopbackModule, unload)
 {
     settings::s_module::s_loopback params{};
     audio_loopback_module module{TestData::get_services()};
@@ -34,7 +38,7 @@ TEST(AudioLoopbackModule, unload)
     ASSERT_TRUE(module.unload());
 }
 
-TEST(AudioLoopbackModule, loaded)
+TEST_F(AudioLoopbackModule, loaded)
 {
     settings::s_module::s_loopback params{};
     audio_loopback_module module{TestData::get_services()};

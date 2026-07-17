@@ -104,8 +104,39 @@ class needs_pulse_audio : public ::testing::Test
 protected:
     void SetUp() override
     {
-        if (!pulse::mainloop_service{TestData::get_services()}.available())
+        if (!daemon_reachable())
             GTEST_SKIP() << "no PulseAudio daemon on this machine";
+    }
+
+private:
+    static bool daemon_reachable()
+    {
+        pa_mainloop* loop = pa_mainloop_new();
+        pa_context* context = pa_context_new(pa_mainloop_get_api(loop), "multiroom-tests");
+        bool reachable = false;
+        if (pa_context_connect(context, nullptr, PA_CONTEXT_NOFLAGS, nullptr) >= 0)
+        {
+            for (bool settled = false; !settled;)
+            {
+                switch (pa_context_get_state(context))
+                {
+                case PA_CONTEXT_READY:
+                    reachable = true;
+                    settled = true;
+                    break;
+                case PA_CONTEXT_FAILED:
+                case PA_CONTEXT_TERMINATED:
+                    settled = true;
+                    break;
+                default:
+                    settled = pa_mainloop_iterate(loop, 1, nullptr) < 0;
+                }
+            }
+        }
+        pa_context_disconnect(context);
+        pa_context_unref(context);
+        pa_mainloop_free(loop);
+        return reachable;
     }
 };
 

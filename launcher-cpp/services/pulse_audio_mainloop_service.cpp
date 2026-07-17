@@ -13,14 +13,11 @@ namespace pulse
     {
         logger_ = services_->get<logger_factory>()->create("MainloopService");
         mainloop_ = pa_threaded_mainloop_new();
-        if (int error = pa_threaded_mainloop_start(mainloop_) != 0)
+        const int error = pa_threaded_mainloop_start(mainloop_);
+        available_ = error == 0;
+        if (!available_)
         {
             logger_->error("Failed to start serving thread. Error: {}", pa_strerror(error));
-            available_ = false;
-        }
-        else
-        {
-            available_ = true;
         }
     }
 
