@@ -96,16 +96,22 @@ a heuristic, not an FFT — enough to catch silence, drift and mangled audio wit
 
 ## Building
 
+argparse is a submodule, and cmake will not configure without it:
+
 ```bash
+git clone --recurse-submodules https://github.com/liubimba/purrcast
+# already cloned? git submodule update --init --recursive
+
 sudo apt install libboost-all-dev libpulse-dev libasound2-dev pkg-config \
                  libavahi-client-dev libflac-dev libogg-dev libvorbis-dev libopus-dev
 
 cmake -S launcher-cpp -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j$(nproc)
-cd backend-go  && go build ./...
-cd web-react   && npm ci && npm run build
+(cd backend-go && go build ./...)
+(cd web-react  && npm ci && npm run build)
 ```
 
-Needs Node 20+ and Go 1.22+.
+Needs Node 20+ and Go 1.22+. The first cmake run also builds the vendored Snapcast, Boost and
+abseil, so it takes a while.
 
 ## Tests
 
