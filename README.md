@@ -100,7 +100,8 @@ argparse is a submodule, and cmake will not configure without it:
 
 ```bash
 git clone --recurse-submodules https://github.com/liubimba/purrcast
-# already cloned? git submodule update --init --recursive
+cd purrcast
+# cloned it without --recurse-submodules? git submodule update --init --recursive
 
 sudo apt install libboost-all-dev libpulse-dev libasound2-dev pkg-config \
                  libavahi-client-dev libflac-dev libogg-dev libvorbis-dev libopus-dev
