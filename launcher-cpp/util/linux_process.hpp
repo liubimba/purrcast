@@ -28,7 +28,7 @@ private:
     bool execute_internal_(const std::string& cmd, const std::string& args);
     bool terminate_internal_();
 
-    pid_t pid_ = -1;
+    std::atomic<pid_t> pid_{-1};
     std::thread monitor_thread_;
     std::atomic<process_state> state_;
     std::unique_ptr<task_executor> executor_;

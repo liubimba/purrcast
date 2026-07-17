@@ -10,6 +10,23 @@
 #include "../logger/logger_factory.hpp"
 #include "absl/strings/str_format.h"
 
+namespace
+{
+    const char* name_of(process_state state)
+    {
+        switch (state)
+        {
+        case process_state::NEW: return "NEW";
+        case process_state::EXECUTING: return "EXECUTING";
+        case process_state::RUNNING: return "RUNNING";
+        case process_state::TERMINATING: return "TERMINATING";
+        case process_state::TERMINATED: return "TERMINATED";
+        case process_state::FAILED: return "FAILED";
+        }
+        return "UNKNOWN";
+    }
+}
+
 
 linux_process::linux_process(const services* services, const std::string& id):
     i_process(services, id),
@@ -38,11 +55,11 @@ linux_process::~linux_process()
 
 process_result linux_process::execute(const std::string& cmd, const std::string& args)
 {
-    if (state_ != process_state::NEW)
-        throw std::runtime_error("LinuxProcess::execute() called with state different to ProcessState::NEW");
     if (cmd.empty())
         throw std::runtime_error("LinuxProcess::execute() called with empty command");
-    state_ = process_state::EXECUTING;
+    process_state expected = process_state::NEW;
+    if (!state_.compare_exchange_strong(expected, process_state::EXECUTING))
+        throw std::runtime_error("LinuxProcess::execute() called with state different to ProcessState::NEW");
     logger_->info("Post task to execute: {} {}", cmd, args);
     std::future<bool> future = executor_->post<bool>([=] { return execute_internal_(cmd, args); });
     if (future.wait_for(timeout_) == std::future_status::ready && future.get())
@@ -57,16 +74,16 @@ process_result linux_process::execute(const std::string& cmd, const std::string&
 
 process_result linux_process::terminate()
 {
-    if (state_ == process_state::NEW)
-        throw std::runtime_error("LinuxProcess::terminate() called with state NEW");
-    if (state_ == process_state::FAILED)
-        throw std::runtime_error("LinuxProcess::terminate() called with state FAILED");
-    if (state_ == process_state::TERMINATING)
-        throw std::runtime_error("LinuxProcess::terminate() called in state TERMINATING");
-    if (state_ == process_state::TERMINATED)
-        throw std::runtime_error("LinuxProcess::terminate() called in state TERMINATED");
+    process_state observed = state_.load();
+    for (;;)
+    {
+        if (observed != process_state::RUNNING && observed != process_state::EXECUTING)
+            throw std::runtime_error(
+                absl::StrFormat("LinuxProcess::terminate() called in state %s", name_of(observed)));
+        if (state_.compare_exchange_weak(observed, process_state::TERMINATING))
+            break;
+    }
     logger_->info("Post task to terminate");
-    state_ = process_state::TERMINATING;
     std::future<bool> future = executor_->post<bool>([this] { return terminate_internal_(); });
     if (future.wait_for(timeout_) == std::future_status::ready && future.get())
     {
@@ -89,17 +106,18 @@ process_state linux_process::state()
 
 void linux_process::monitor_()
 {
-    logger_->info("[Monitor]: wait for pid: {}", pid_);
-    if (pid_ > 0)
+    const pid_t pid = pid_.load();
+    logger_->info("[Monitor]: wait for pid: {}", pid);
+    if (pid > 0)
     {
         int status;
-        waitpid(pid_, &status, 0);
+        waitpid(pid, &status, 0);
         if (WEXITSTATUS(status) != 0)
             logger_->error("[Monitor]: forked process exit unsuccessfully. Status: ", status);
         else
             logger_->info("[Monitor]: forked process exited");
         state_ = process_state::TERMINATED;
-        pid_ = -1;
+        pid_.store(-1);
         std::for_each(listeners_.begin(), listeners_.end(),
                       [](i_process_listener* listener) { listener->onTerminate(); });
     }
@@ -149,13 +167,17 @@ bool linux_process::execute_internal_(const std::string& cmd, const std::string&
 bool linux_process::terminate_internal_()
 {
     logger_->info("Terminating");
-    int error = kill(-pid_, SIGTERM);
-    if (error != 0)
+    const pid_t pid = pid_.exchange(-1);
+    if (pid <= 0)
     {
-        logger_->error("kill() {} failed: {}", pid_, strerror(errno));
+        logger_->info("Already reaped; nothing to signal");
+        return true;
+    }
+    if (kill(-pid, SIGTERM) != 0)
+    {
+        logger_->error("kill() {} failed: {}", pid, strerror(errno));
         return false;
     }
-    pid_ = -1;
     if (monitor_thread_.joinable())
     {
         logger_->info("Monitor thread join");
